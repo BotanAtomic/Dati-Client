@@ -10,6 +10,3 @@
 int socket_addr;
 
 void begin_connection();
-
-void *connection_handler(void *socket_desc);
-

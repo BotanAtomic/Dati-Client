@@ -42,34 +42,19 @@ void begin_connection() {
 
     printf("Successfully connected to database server [%s:%d]\n", server_name, server_port);
 
-    login("root", "pass", sock);
 
-    /**pthread_t thread_id;
+    unsigned char buffer[1];
 
-    pthread_create(&thread_id, NULL, connection_handler, (void *) &sock);
-
-    pthread_join(thread_id, NULL); **/
-
-}
-
-void *connection_handler(void *socket_desc) {
     ssize_t size;
-    int sock = (int) socket_desc;
-
-    char *buffer[1];
-
-    printf("Listen...0\n");
 
     while ((size = recv(sock, buffer, 1, 0)) > 0) {
-        printf("Listen...\n");
+        printf("Receive message %d", buffer[0]);
     }
-
 
     if (size == 0) {
         printf("Connection terminated : server closed\n");
     } else if (size == -1) {
         printf("Read error\n");
     }
-
 }
 
