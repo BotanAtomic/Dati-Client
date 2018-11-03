@@ -13,8 +13,7 @@
 /** @Message_id : 0 **
  *  @Response : unsigned char : SUCCESS(1)/FAILED(0)
 **/
-void login(struct client);
-
+unsigned char login(struct client *client);
 
 
 /*** DATABASES **/
@@ -22,17 +21,17 @@ void login(struct client);
 /** @Message_id : 1 **
  *  @Response : *char[] : list of databases
 **/
-void get_databases(struct client client);
+char **get_databases(struct client client);
 
 /** @Message_id : 2 **
  *  @Response : unsigned char : SUCCESS(1)/FAILED(0) & unsigned char : error_code
 **/
-void create_database(struct client client, char *name);
+unsigned char create_database(struct client client, char *name);
 
 /** @Message_id : 3 **
  *  @Response : unsigned char : SUCCESS(1)/FAILED(0) & unsigned char : error_code
 **/
-void remove_database(struct client client, char *name);
+unsigned char remove_database(struct client client, char *name);
 
 /** @Message_id : 4 **
  *  @Response : unsigned char : SUCCESS(1)/FAILED(0) & unsigned char : error_code
@@ -57,3 +56,7 @@ void remove_table(struct client client, char *database, char *name);
 **/
 void rename_table(struct client client, char *database, char *new_name);
 
+
+/*** QUERY ***/
+
+//TODO : query

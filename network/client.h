@@ -10,7 +10,7 @@
 struct session {
     unsigned char connected;
     int socket;
-} session;
+};
 
 struct client {
     struct session session;
@@ -22,6 +22,6 @@ struct client {
 
 };
 
-unsigned char begin_connection(struct client client);
+unsigned char begin_connection(struct client * client);
 
 #endif //DATI_CLIENT_H

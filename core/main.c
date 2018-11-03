@@ -28,8 +28,17 @@ int main() {
     client.host = "localhost";
     client.port = 6999;
 
-    if(begin_connection(client)) {
+    if (begin_connection(&client)) {
+        unsigned char response = login(&client);
+        println("Login response : %s", (client.session.connected ? "SUCCESS" : "FAILED"));
 
+        if (response) {
+            response = create_database(client, "esgi");
+
+            println("Creation of database : %d", response);
+
+
+        }
     }
 
 
