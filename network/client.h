@@ -19,9 +19,13 @@ struct client {
 
     char *username;
     char *password;
-
 };
 
-unsigned char begin_connection(struct client * client);
+typedef struct database_container {
+    char **databases;
+    uint16_t count;
+} database_container;
+
+unsigned char begin_connection(struct client *client);
 
 #endif //DATI_CLIENT_H

@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include "../network/client.h"
 #include "../network/protocol.h"
 #include "../shell/shell.h"
@@ -19,6 +20,14 @@ int main() {
           "     ~~            \\/__/                       \\/__/         \\/__/         \\|__|    \n\nAPI v %s\n\n",
           VERSION);
 
+    char **arr = (char **) calloc(10, sizeof(char *));
+
+    for (int i = 0; i < 10; i++) {
+        arr[i] = (char *) calloc(20, sizeof(char));
+    }
+
+    println("Size of test : %d", sizeof(arr));
+
 
     struct client client;
     client.username = "root";
@@ -31,14 +40,16 @@ int main() {
         println("Login response : %s", (client.session.connected ? "SUCCESS" : "FAILED"));
 
         if (response) {
-            create_database(client, "esgi");
+            if(create_database(client, "esgi") == 1) {
+                println("Database successfully created !");
+            }
 
-            char **databases = get_databases(client);
+            database_container database_container = get_databases(client);
 
-            if (databases != NULL)
-                for (int i = 0; i < sizeof(databases); i++) {
-                    println("We have database '%s'", databases[i]);
-                }
+            for (int i = 0; i < database_container.count; i++) {
+                println("Database[%d] : '%s'", i, database_container.databases[i]);
+            }
+
         }
     }
 

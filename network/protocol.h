@@ -21,7 +21,7 @@ unsigned char login(struct client *client);
 /** @Message_id : 1 **
  *  @Response : *char[] : list of databases
 **/
-char **get_databases(struct client client);
+database_container get_databases(struct client client);
 
 /** @Message_id : 2 **
  *  @Response : unsigned char : SUCCESS(1)/FAILED(0) & unsigned char : error_code
