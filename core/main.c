@@ -1,8 +1,6 @@
-#include <stdio.h>
 #include "../network/client.h"
 #include "../network/protocol.h"
 #include "../shell/shell.h"
-#include <pthread.h>
 
 #define VERSION "0.0.1"
 
@@ -33,11 +31,14 @@ int main() {
         println("Login response : %s", (client.session.connected ? "SUCCESS" : "FAILED"));
 
         if (response) {
-            response = create_database(client, "esgi");
+            create_database(client, "esgi");
 
-            println("Creation of database : %d", response);
+            char **databases = get_databases(client);
 
-
+            if (databases != NULL)
+                for (int i = 0; i < sizeof(databases); i++) {
+                    println("We have database '%s'", databases[i]);
+                }
         }
     }
 

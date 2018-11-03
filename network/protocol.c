@@ -41,7 +41,34 @@ unsigned char login(struct client *client) {
 }
 
 char **get_databases(struct client client) {
-    return NULL;
+    int socket = client.session.socket;
+    write_ubyte(1, socket);
+    write_ushort((__uint16_t) 0, socket);
+
+    char **databases = NULL;
+
+    if (read_ubyte(socket) == 1) {
+        uint16_t databases_size = read_ushort(socket);
+        uint16_t databases_count = read_ushort(socket);
+
+        databases = malloc(databases_count * sizeof(char));
+
+        if (databases_count > 0) {
+            char *token = strtok(read_string(databases_size, socket), "@");
+
+            int i = 0;
+            while (token != NULL) {
+                databases[i] = malloc(strlen(token) * sizeof(char));
+                strcpy(databases[i], token);
+                token = strtok(NULL, "@");;
+                i++;
+            }
+
+        }
+
+    }
+
+    return databases;
 }
 
 unsigned char create_database(struct client client, char *name) {
