@@ -6,8 +6,7 @@
 #define DATI_PROTOCOL_H
 
 #include "client.h"
-
-#endif //DATI_PROTOCOL_H
+#include "query.h"
 
 
 /** @Message_id : 0 **
@@ -63,4 +62,10 @@ unsigned char rename_table(struct client client, char *database, char *last_name
 
 /*** QUERY ***/
 
-//TODO : query
+/** @Message_id : 9 **
+ *  @_uuid : unique id of inserted statement
+*  @Response : insert_result { @_uuid, @error_code }
+**/
+insert_result insert(struct client client, char *database, char *table, insert_query);
+
+#endif //DATI_PROTOCOL_H

@@ -6,6 +6,7 @@
 #define DATI_CLIENT_H
 
 #include <stdint.h>
+#include "protocol.h"
 
 struct session {
     unsigned char connected;
@@ -21,10 +22,7 @@ struct client {
     char *password;
 };
 
-typedef struct container {
-    char **entities;
-    uint16_t count;
-} container;
+
 
 unsigned char begin_connection(struct client *client);
 

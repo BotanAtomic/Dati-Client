@@ -8,9 +8,7 @@
 #include "buffer.h"
 
 void write_ubyte(unsigned char byte, int socket) {
-    unsigned char buffer[1];
-    buffer[0] = byte;
-    send(socket, buffer, 1, 0);
+    send(socket, &byte, 1, 0);
 }
 
 void write_ushort(__uint16_t u16, int socket) {
@@ -22,6 +20,15 @@ void write_ushort(__uint16_t u16, int socket) {
 
 void write_string(char *str, int socket) {
     send(socket, str, strlen(str), 0);
+}
+
+void write_ulong(unsigned long long value, int socket) {
+    unsigned char buffer[8];
+
+    for (int i = 0; i < 8; i++)
+        buffer[i] = (unsigned char) ((value >> (8 * i) != 0));
+
+    send(socket, buffer, 8, 0);
 }
 
 char *read_string(size_t size, int socket) {
@@ -38,7 +45,19 @@ __uint16_t read_ushort(int socket) {
 }
 
 unsigned char read_ubyte(int socket) {
-    unsigned char buffer[1];
-    recv(socket, buffer, 1, 0);
-    return buffer[0];
+    unsigned char buffer;
+    recv(socket, &buffer, 1, 0);
+    return buffer;
+}
+
+unsigned long long read_ulong(int socket) {
+    unsigned char buffer[8];
+    recv(socket, buffer, 8, 0);
+
+    unsigned long long value = 0;
+
+    for (int i = 0; i < 8; i++)
+        value += (buffer[i] << (8 * i));
+
+    return value;
 }
