@@ -4,7 +4,7 @@
 #include "../network/protocol.h"
 #include "../shell/shell.h"
 
-#define VERSION "0.0.1"
+#define VERSION "0.0.5"
 
 
 int main() {
@@ -32,7 +32,7 @@ int main() {
         println("Login response : %s", (client.session.connected ? "SUCCESS" : "FAILED"));
 
         if (response) {
-            println("Return create table %d",   create_database(client, "esgi"));
+            println("Return create database %d", create_database(client, "esgi"));
 
             container database_container = get_databases(client);
             for (int i = 0; i < database_container.count; i++) {
@@ -41,11 +41,17 @@ int main() {
 
             println("Return create table %d", create_table(client, "esgi", "students"));
 
-            container table_container = get_tables(client,"esgi");
+            container table_container = get_tables(client, "esgi");
             for (int i = 0; i < table_container.count; i++) {
                 println("Table[%d] : '%s'", i, table_container.entities[i]);
             }
 
+            println("Return rename table %d", rename_table(client, "esgi", "students", "pas"));
+
+            table_container = get_tables(client, "esgi");
+            for (int i = 0; i < table_container.count; i++) {
+                println("Table[%d] : '%s'", i, table_container.entities[i]);
+            }
 
         }
     }

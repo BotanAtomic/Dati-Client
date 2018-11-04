@@ -58,7 +58,7 @@ unsigned char remove_table(struct client client, char *database, char *name);
 /** @Message_id : 8 **
  *  @Response : unsigned char : SUCCESS(1)/FAILED(0) & unsigned char : error_code
 **/
-unsigned char rename_table(struct client client, char *database, char *new_name);
+unsigned char rename_table(struct client client, char *database, char *last_name, char *new_name);
 
 
 /*** QUERY ***/

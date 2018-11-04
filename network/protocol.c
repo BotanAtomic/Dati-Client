@@ -195,3 +195,55 @@ unsigned char create_table(struct client client, char *database, char *name) {
 
     return 0;
 }
+
+unsigned char remove_table(struct client client, char *database, char *name) {
+    int socket = client.session.socket;
+
+    write_ubyte(7, socket);
+    write_ushort((__uint16_t) strlen(database), socket);
+    write_string(database, socket);
+
+    write_ushort((__uint16_t) strlen(name), socket);
+    write_string(name, socket);
+
+    if (read_ubyte(socket) == 7) {
+        unsigned char response;
+        if (read_ubyte(socket) == 0) {
+            response = read_ubyte(socket);
+        } else {
+            response = 1;
+        }
+
+        return response;
+    }
+
+    return 0;
+}
+
+unsigned char rename_table(struct client client, char *database, char *last_name, char *new_name) {
+    int socket = client.session.socket;
+
+    write_ubyte(8, socket);
+    write_ushort((__uint16_t) strlen(database), socket);
+    write_string(database, socket);
+
+    write_ushort((__uint16_t) strlen(last_name), socket);
+    write_string(last_name, socket);
+
+    write_ushort((__uint16_t) strlen(new_name), socket);
+    write_string(new_name, socket);
+
+    if (read_ubyte(socket) == 8) {
+        unsigned char response;
+        if (read_ubyte(socket) == 0) {
+            response = read_ubyte(socket);
+        } else {
+            response = 1;
+        }
+
+        return response;
+    }
+
+    return 0;
+}
+
