@@ -40,24 +40,20 @@ unsigned char login(struct client *client) {
     return 0;
 }
 
-database_container get_databases(struct client client) {
+container get_databases(struct client client) {
     int socket = client.session.socket;
     write_ubyte(1, socket);
     write_ushort((__uint16_t) 0, socket);
 
-    database_container container = {};
+    container container = {};
 
     if (read_ubyte(socket) == 1) {
         uint16_t databases_size = read_ushort(socket);
         uint16_t databases_count = read_ushort(socket);
 
-        println("Database count : %d", databases_count);
-
         container.count = databases_count;
 
         char **databases = malloc(sizeof(char *) * databases_count);
-
-        println("Database size : %d", sizeof(databases));
 
         if (databases_count > 0) {
             char *token = strtok(read_string(databases_size, socket), "@");
@@ -68,10 +64,9 @@ database_container get_databases(struct client client) {
                 token = strtok(NULL, "@");;
                 i++;
             }
-
         }
 
-        container.databases = databases;
+        container.entities = databases;
     }
 
     return container;
@@ -106,6 +101,88 @@ unsigned char remove_database(struct client client, char *name) {
     write_string(name, socket);
 
     if (read_ubyte(socket) == 3) {
+        unsigned char response;
+        if (read_ubyte(socket) == 0) {
+            response = read_ubyte(socket);
+        } else {
+            response = 1;
+        }
+
+        return response;
+    }
+
+    return 0;
+}
+
+unsigned char rename_database(struct client client, char *database, char *new_name) {
+    int socket = client.session.socket;
+
+    write_ubyte(4, socket);
+    write_ushort((__uint16_t) strlen(database), socket);
+    write_string(database, socket);
+    write_ushort((__uint16_t) strlen(new_name), socket);
+    write_string(new_name, socket);
+
+    if (read_ubyte(socket) == 4) {
+        unsigned char response;
+        if (read_ubyte(socket) == 0) {
+            response = read_ubyte(socket);
+        } else {
+            response = 1;
+        }
+
+        return response;
+    }
+
+    return 0;
+}
+
+container get_tables(struct client client, char *database) {
+    int socket = client.session.socket;
+
+    write_ubyte(5, socket);
+    write_ushort((__uint16_t) strlen(database), socket);
+    write_string(database, socket);
+
+    container container = {};
+
+    if (read_ubyte(socket) == 5) {
+        uint16_t tables_size = read_ushort(socket);
+        uint16_t tables_count = read_ushort(socket);
+
+        container.count = tables_count;
+
+        char **tables = malloc(sizeof(char *) * tables_count);
+
+        if (tables_count > 0) {
+            char *token = strtok(read_string(tables_size, socket), "@");
+
+            int i = 0;
+            while (token != NULL) {
+                tables[i] = token;
+                token = strtok(NULL, "@");;
+                i++;
+            }
+        }
+
+        container.entities = tables;
+    }
+
+    return container;
+}
+
+unsigned char create_table(struct client client, char *database, char *name) {
+    int socket = client.session.socket;
+
+    write_ubyte(6, socket);
+
+    write_ushort((__uint16_t) strlen(database), socket);
+    write_string(database, socket);
+
+    write_ushort((__uint16_t) strlen(name), socket);
+    write_string(name, socket);
+
+    if (read_ubyte(socket) == 6) {
         unsigned char response;
         if (read_ubyte(socket) == 0) {
             response = read_ubyte(socket);

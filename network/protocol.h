@@ -21,7 +21,7 @@ unsigned char login(struct client *client);
 /** @Message_id : 1 **
  *  @Response : *char[] : list of databases
 **/
-database_container get_databases(struct client client);
+container get_databases(struct client client);
 
 /** @Message_id : 2 **
  *  @Response : unsigned char : SUCCESS(1)/FAILED(0) & unsigned char : error_code
@@ -36,25 +36,29 @@ unsigned char remove_database(struct client client, char *name);
 /** @Message_id : 4 **
  *  @Response : unsigned char : SUCCESS(1)/FAILED(0) & unsigned char : error_code
 **/
-void rename_database(struct client client, char *new_name);
+unsigned char rename_database(struct client client, char *database, char *new_name);
 
 
 /*** TABLES ***/
-
 /** @Message_id : 5 **
- *  @Response : unsigned char : SUCCESS(1)/FAILED(0) & unsigned char : error_code
+ *  @Response : *char[] : list of tables of specified database
 **/
-void create_table(struct client client, char *database, char *name);
+container get_tables(struct client client, char *database);
 
 /** @Message_id : 6 **
  *  @Response : unsigned char : SUCCESS(1)/FAILED(0) & unsigned char : error_code
 **/
-void remove_table(struct client client, char *database, char *name);
+unsigned char create_table(struct client client, char *database, char *name);
 
 /** @Message_id : 7 **
  *  @Response : unsigned char : SUCCESS(1)/FAILED(0) & unsigned char : error_code
 **/
-void rename_table(struct client client, char *database, char *new_name);
+unsigned char remove_table(struct client client, char *database, char *name);
+
+/** @Message_id : 8 **
+ *  @Response : unsigned char : SUCCESS(1)/FAILED(0) & unsigned char : error_code
+**/
+unsigned char rename_table(struct client client, char *database, char *new_name);
 
 
 /*** QUERY ***/

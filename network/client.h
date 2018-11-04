@@ -21,10 +21,10 @@ struct client {
     char *password;
 };
 
-typedef struct database_container {
-    char **databases;
+typedef struct container {
+    char **entities;
     uint16_t count;
-} database_container;
+} container;
 
 unsigned char begin_connection(struct client *client);
 

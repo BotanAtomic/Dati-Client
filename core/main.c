@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 #include "../network/client.h"
 #include "../network/protocol.h"
 #include "../shell/shell.h"
@@ -20,15 +21,6 @@ int main() {
           "     ~~            \\/__/                       \\/__/         \\/__/         \\|__|    \n\nAPI v %s\n\n",
           VERSION);
 
-    char **arr = (char **) calloc(10, sizeof(char *));
-
-    for (int i = 0; i < 10; i++) {
-        arr[i] = (char *) calloc(20, sizeof(char));
-    }
-
-    println("Size of test : %d", sizeof(arr));
-
-
     struct client client;
     client.username = "root";
     client.password = "password";
@@ -40,15 +32,20 @@ int main() {
         println("Login response : %s", (client.session.connected ? "SUCCESS" : "FAILED"));
 
         if (response) {
-            if(create_database(client, "esgi") == 1) {
-                println("Database successfully created !");
-            }
+            println("Return create table %d",   create_database(client, "esgi"));
 
-            database_container database_container = get_databases(client);
-
+            container database_container = get_databases(client);
             for (int i = 0; i < database_container.count; i++) {
-                println("Database[%d] : '%s'", i, database_container.databases[i]);
+                println("Database[%d] : '%s'", i, database_container.entities[i]);
             }
+
+            println("Return create table %d", create_table(client, "esgi", "students"));
+
+            container table_container = get_tables(client,"esgi");
+            for (int i = 0; i < table_container.count; i++) {
+                println("Table[%d] : '%s'", i, table_container.entities[i]);
+            }
+
 
         }
     }
