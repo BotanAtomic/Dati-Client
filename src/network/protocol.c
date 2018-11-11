@@ -2,11 +2,7 @@
 // Created by Botan on 27/10/18.
 //
 #include "protocol.h"
-#include <sys/socket.h>
-#include <string.h>
-#include <stdlib.h>
-#include "buffer.h"
-#include "../shell/shell.h"
+
 
 unsigned char login(struct client *client) {
     int socket = client->session.socket;

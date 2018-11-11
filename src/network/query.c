@@ -4,9 +4,6 @@
 
 
 #include "query.h"
-#include "buffer.h"
-#include "../shell/shell.h"
-#include "../utils/decimal.h"
 
 static const unsigned char PRIMITIVE_SIZE[] = {1, 1, 2, 2, 4, 4, 8, 8, 4, 8, /* string */ 0};
 
@@ -53,7 +50,6 @@ value get_uint(uint32_t i) {
 
 value get_float(float f) {
     char *buffer = malloc(4);
-
     write_float(f, buffer);
 
     value value = {"", DOUBLE, (void *) buffer};
@@ -76,7 +72,7 @@ value get_string(char *s) {
 
 
 char *serialize_value(value value) {
-    if(strlen(value.key) > 255)
+    if (strlen(value.key) > 255)
         return 0;
 
     char *buffer;
@@ -90,15 +86,13 @@ char *serialize_value(value value) {
     uint16_t index = 0;
 
     put_uchar(buffer, (unsigned char) strlen(value.key), index++);
-    put_string(buffer, value.key, index += strlen((const char*)  value.key));
+    put_string(buffer, value.key, index += strlen((const char *) value.key));
 
     put_uchar(buffer, value.type, index++);
 
     if (value.type == STRING) {
-        put_uint(buffer, (uint32_t) strlen((const char*) value.value), index++);
+        put_uint(buffer, (uint32_t) strlen((const char *) value.value), index++);
     }
-
-    println("Index is %d", index);
 
     switch (value.type) {
         case CHAR:
@@ -134,12 +128,11 @@ char *serialize_value(value value) {
             break;
 
         case FLOAT:
-            put_float(buffer, )
+            put_float(buffer, (char *) value.value, index);
             break;
 
-
         case DOUBLE:
-
+            put_double(buffer, (char *) value.value, index);
             break;
 
         case STRING:
@@ -189,11 +182,11 @@ void put_ulong(char *buffer, uint64_t ulong_value, uint16_t position) {
         buffer[position + i] = (unsigned char) ((ulong_value >> (8 * i) != 0));
 }
 
-void put_float(char *buffer, char* char_ptr, uint16_t position) {
+void put_float(char *buffer, char *char_ptr, uint16_t position) {
     memcpy(buffer + position, char_ptr, 4);
 }
 
-void put_double(char *buffer, char* char_ptr, uint16_t position) {
+void put_double(char *buffer, char *char_ptr, uint16_t position) {
     memcpy(buffer + position, char_ptr, 8);
 }
 

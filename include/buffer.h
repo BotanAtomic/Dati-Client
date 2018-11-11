@@ -7,7 +7,9 @@
 
 #endif //DATI_BUFFER_H
 
-#include "stdio.h"
+#include <sys/socket.h>
+#include <string.h>
+#include <stdlib.h>
 
 void write_ubyte(unsigned char byte, int socket);
 

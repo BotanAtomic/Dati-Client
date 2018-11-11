@@ -2,9 +2,7 @@
 // Created by Botan on 27/10/18.
 //
 
-#include <sys/socket.h>
-#include <string.h>
-#include <stdlib.h>
+
 #include "buffer.h"
 
 void write_ubyte(unsigned char byte, int socket) {

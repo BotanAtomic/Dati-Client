@@ -3,15 +3,6 @@
 //
 
 #include "client.h"
-#include "protocol.h"
-#include <arpa/inet.h>
-#include <stdio.h>
-#include <string.h>
-#include <sys/socket.h>
-#include <stdlib.h>
-#include <pthread.h>
-#include "../shell/shell.h"
-#include "buffer.h"
 
 
 unsigned char begin_connection(struct client *client) {

@@ -7,7 +7,11 @@
 
 #include "client.h"
 #include "query.h"
-
+#include <sys/socket.h>
+#include <string.h>
+#include <stdlib.h>
+#include "buffer.h"
+#include "shell.h"
 
 /** @Message_id : 0 **
  *  @Response : unsigned char : SUCCESS(1)/FAILED(0)

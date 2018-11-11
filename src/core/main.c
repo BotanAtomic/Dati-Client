@@ -1,20 +1,11 @@
-#include "../network/protocol.h"
-#include "../shell/shell.h"
-#include "../network/query.h"
-#include "../utils/decimal.h"
+#include "protocol.h"
+#include "shell.h"
+#include "query.h"
 
-#define VERSION "0.0.5"
+#define VERSION "0.0.10"
 
 
 int main() {
-    char* dbuffer = malloc(8);
-
-    write_double(537453.6, dbuffer);
-
-    double d = read_double(dbuffer);
-
-    printf("HMM : %lf\n", d);
-
     print("      ___           ___           ___           ___           ___           ___     \n"
           "     /\\  \\         /\\  \\         /\\  \\         /\\__\\         /\\  \\         /\\__\\    \n"
           "    /::\\  \\       /::\\  \\        \\:\\  \\       /:/  /        /::\\  \\       /:/  /    \n"
@@ -54,7 +45,7 @@ int main() {
             }
 
 
-            insert_query insert_query = {malloc(0), 0};
+            insert_query insert_query = {0, 0};
 
             insert_append(&insert_query, "name", get_string("jerome"));
             insert_append(&insert_query, "count", get_int(10));

@@ -6,6 +6,15 @@
 #define DATI_CLIENT_H
 
 #include <stdint.h>
+#include "shell.h"
+#include "buffer.h"
+
+#include <arpa/inet.h>
+#include <stdio.h>
+#include <string.h>
+#include <sys/socket.h>
+#include <stdlib.h>
+#include <pthread.h>
 
 typedef struct session {
     unsigned char connected;

@@ -9,6 +9,9 @@
 #include <stdint.h>
 #include <malloc.h>
 #include <string.h>
+#include "buffer.h"
+#include "shell.h"
+#include "decimal.h"
 
 typedef enum var_type {
     CHAR,
