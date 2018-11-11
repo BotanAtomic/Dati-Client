@@ -22,7 +22,7 @@ void write_string(char *str, int socket) {
     send(socket, str, strlen(str), 0);
 }
 
-void write_ulong(unsigned long long value, int socket) {
+void write_ulong(__uint64_t value, int socket) {
     unsigned char buffer[8];
 
     for (int i = 0; i < 8; i++)
@@ -50,11 +50,11 @@ unsigned char read_ubyte(int socket) {
     return buffer;
 }
 
-unsigned long long read_ulong(int socket) {
+__uint64_t read_ulong(int socket) {
     unsigned char buffer[8];
     recv(socket, buffer, 8, 0);
 
-    unsigned long long value = 0;
+    __uint64_t value = 0;
 
     for (int i = 0; i < 8; i++)
         value += (buffer[i] << (8 * i));

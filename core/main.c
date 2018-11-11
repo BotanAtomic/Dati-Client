@@ -1,11 +1,20 @@
 #include "../network/protocol.h"
 #include "../shell/shell.h"
 #include "../network/query.h"
+#include "../utils/decimal.h"
 
 #define VERSION "0.0.5"
 
 
 int main() {
+    char* dbuffer = malloc(8);
+
+    write_double(537453.6, dbuffer);
+
+    double d = read_double(dbuffer);
+
+    printf("HMM : %lf\n", d);
+
     print("      ___           ___           ___           ___           ___           ___     \n"
           "     /\\  \\         /\\  \\         /\\  \\         /\\__\\         /\\  \\         /\\__\\    \n"
           "    /::\\  \\       /::\\  \\        \\:\\  \\       /:/  /        /::\\  \\       /:/  /    \n"
@@ -14,12 +23,12 @@ int main() {
           " /:/__/ \\:|__| /:/\\:\\ \\:\\__\\     /:/\\:\\__\\ /:/__/  /\\__\\ /:/\\:\\ \\:\\__\\ /:/\\:::::\\__\\\n"
           " \\:\\  \\ /:/  / \\/__\\:\\/:/  /    /:/  \\/__/ \\:\\  \\ /:/  / \\/__\\:\\/:/  / \\/_|:|~~|~   \n"
           "  \\:\\  /:/  /       \\::/  /    /:/  /       \\:\\  /:/  /       \\::/  /     |:|  |    \n"
-          "   \\:\\/:/  /        /:/  /     \\/__/         \\:\\/:/  /        /:/  /      |:|  |    \n"
-          "    \\::/__/        /:/  /                     \\::/  /        /:/  /       |:|  |    \n"
-          "     ~~            \\/__/                       \\/__/         \\/__/         \\|__|    \n\nAPI v %s\n\n",
+          "   \\:\\/:/  /        /:/  /    /:/  /         \\:\\/:/  /        /:/  /      |:|  |    \n"
+          "    \\::/__/        /:/  /    /:/  /           \\::/  /        /:/  /       |:|  |    \n"
+          "     ~~            \\/__/     \\/__/             \\/__/         \\/__/         \\|__|    \n\nAPI v %s\n\n",
           VERSION);
 
-    struct client client;
+    client client;
     client.username = "root";
     client.password = "password";
     client.host = "localhost";
@@ -45,19 +54,14 @@ int main() {
             }
 
 
-            insert_query insert_query = {malloc(1), 0, 0};
+            insert_query insert_query = {malloc(0), 0};
 
-            insert_append(&insert_query, "name", to_string("jerome"));
-            insert_append(&insert_query, "count", to_int(5));
-            insert_append(&insert_query, "age", to_uchar(28));
-            insert_append(&insert_query, "size", to_double(1.89));
+            insert_append(&insert_query, "name", get_string("jerome"));
+            insert_append(&insert_query, "count", get_int(10));
+            insert_append(&insert_query, "age", get_uchar(28));
+            insert_append(&insert_query, "test_double", get_double(52.6857874));
 
-
-            for (int i = 0; i < insert_query.count; i++) {
-                println("Line[%d] = %s", i, insert_query.values[i]);
-            }
-
-
+            insert(client, "esgi", "students", insert_query);
         }
     }
 

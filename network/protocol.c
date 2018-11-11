@@ -247,3 +247,31 @@ unsigned char rename_table(struct client client, char *database, char *last_name
     return 0;
 }
 
+insert_result insert(struct client client, char *database, char *table, insert_query insert_query) {
+    int socket = client.session.socket;
+
+    insert_result result = {0, 0};
+
+    write_ubyte(9, socket);
+
+    write_ushort((__uint16_t) strlen(database), socket);
+    write_string(database, socket);
+
+    write_ushort((__uint16_t) strlen(table), socket);
+    write_string(table, socket);
+
+    write_ushort(insert_query.count, socket);
+
+    for (int i = 0; i < insert_query.count; i++) {
+        value value = insert_query.values[i];
+
+        char *data = serialize_value(value);
+
+        if (data)
+            send(socket, data, sizeof(data), 0);
+    }
+
+
+    return result;
+}
+

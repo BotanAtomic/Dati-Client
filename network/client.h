@@ -6,21 +6,20 @@
 #define DATI_CLIENT_H
 
 #include <stdint.h>
-#include "protocol.h"
 
-struct session {
+typedef struct session {
     unsigned char connected;
     int socket;
-};
+} session;
 
-struct client {
+typedef struct client {
     struct session session;
     char *host;
     uint16_t port;
 
     char *username;
     char *password;
-};
+} client;
 
 
 

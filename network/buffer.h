@@ -6,20 +6,21 @@
 #define DATI_BUFFER_H
 
 #endif //DATI_BUFFER_H
+
 #include "stdio.h"
 
 void write_ubyte(unsigned char byte, int socket);
 
 void write_ushort(__uint16_t u16, int socket);
 
-void write_ulong(unsigned long long value, int socket);
+void write_ulong(__uint64_t value, int socket);
 
 void write_string(char *str, int socket);
 
-char* read_string(size_t size, int socket);
+char *read_string(size_t size, int socket);
 
 __uint16_t read_ushort(int socket);
 
 unsigned char read_ubyte(int socket);
 
-unsigned long long read_ulong(int socket);
+__uint64_t read_ulong(int socket);

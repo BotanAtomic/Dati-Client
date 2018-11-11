@@ -10,10 +10,8 @@
 #include <malloc.h>
 #include <string.h>
 
-static unsigned char SIZE[] = {1, 1, 2, 2, 4, 4, 8, 8, 4, 8, 0};
-
 typedef enum var_type {
-    CHAR = 0,
+    CHAR,
     UCHAR,
     SHORT,
     USHORT,
@@ -32,21 +30,11 @@ typedef struct container {
 } container;
 
 
-
-
 typedef struct value {
-    const char *key;
-    void *value;
+    char *key;
     var_type type;
+    void *value;
 } value;
-
-typedef struct formatted_value {
-    var_type type;
-    void *value;
-} formatted_value;
-
-
-
 
 typedef struct insert_result {
     unsigned long _uuid;
@@ -55,28 +43,52 @@ typedef struct insert_result {
 
 typedef struct insert_query {
     value *values;
-    uint32_t count;
-    uint64_t size;
+    uint16_t count;
 } insert_query;
 
-void insert_append(insert_query *insert_query, const char *var_name, formatted_value var_value);
+void insert_append(insert_query *insert_query, char *var_name, value value);
 
-formatted_value to_char(char value);
+value get_char(char value);
 
-formatted_value to_uchar(unsigned char value);
+value get_uchar(unsigned char value);
 
-formatted_value to_short(int16_t value);
+value get_short(int16_t value);
 
-formatted_value to_ushort(uint16_t value);
+value get_ushort(uint16_t value);
 
-formatted_value to_int(int32_t value);
+value get_int(int32_t value);
 
-formatted_value to_uint(uint32_t value);
+value get_uint(uint32_t value);
 
-formatted_value to_float(float value);
+value get_float(float value);
 
-formatted_value to_double(double value);
+value get_double(double value);
 
-formatted_value to_string(const char *value);
+value get_string(char *value);
+
+char *serialize_value(value value);
+
+void put_char(char *buffer, char char_value, uint16_t position);
+
+void put_uchar(char *buffer, unsigned char uchar_value, uint16_t position);
+
+void put_short(char *buffer, int16_t short_value, uint16_t position);
+
+void put_ushort(char *buffer, uint16_t ushort_value, uint16_t position);
+
+void put_int(char *buffer, int32_t int_value, uint16_t position);
+
+void put_uint(char *buffer, uint32_t uint_value, uint16_t position);
+
+void put_long(char *buffer, int64_t long_value, uint16_t position);
+
+void put_ulong(char *buffer, uint64_t ulong_value, uint16_t position);
+
+void put_float(char *buffer, char* char_ptr, uint16_t position);
+
+void put_double(char *buffer, char* char_ptr, uint16_t position);
+
+void put_string(char *buffer, char* string, uint16_t position);
+
 
 #endif //DATI_QUERY_H
