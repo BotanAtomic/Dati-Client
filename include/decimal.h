@@ -4,9 +4,6 @@
 
 #ifndef DATI_DECIMAL_H
 #define DATI_DECIMAL_H
-#include <float.h>
-#include <math.h>
-
 
 double read_double(char *buffer);
 

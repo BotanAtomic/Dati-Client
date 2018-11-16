@@ -2,6 +2,8 @@
 // Created by Botan on 27/10/18.
 //
 
+#include <string.h>
+#include <shell.h>
 #include "client.h"
 
 

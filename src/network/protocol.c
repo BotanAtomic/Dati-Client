@@ -1,8 +1,10 @@
 //
 // Created by Botan on 27/10/18.
 //
+#include <buffer.h>
+#include <shell.h>
+#include <malloc.h>
 #include "protocol.h"
-
 
 unsigned char login(struct client *client) {
     int socket = client->session.socket;
@@ -47,7 +49,7 @@ container get_databases(struct client client) {
         uint16_t databases_size = read_ushort(socket);
         uint16_t databases_count = read_ushort(socket);
 
-        container.count = databases_count;
+        container.length = databases_count;
 
         char **databases = malloc(sizeof(char *) * databases_count);
 
@@ -140,13 +142,13 @@ container get_tables(struct client client, char *database) {
     write_ushort((__uint16_t) strlen(database), socket);
     write_string(database, socket);
 
-    container container = {};
+    container container = {0, 0};
 
     if (read_ubyte(socket) == 5) {
         uint16_t tables_size = read_ushort(socket);
         uint16_t tables_count = read_ushort(socket);
 
-        container.count = tables_count;
+        container.length = tables_count;
 
         char **tables = malloc(sizeof(char *) * tables_count);
 
@@ -259,12 +261,7 @@ insert_result insert(struct client client, char *database, char *table, insert_q
     write_ushort(insert_query.count, socket);
 
     for (int i = 0; i < insert_query.count; i++) {
-        value value = insert_query.values[i];
-
-        char *data = serialize_value(value);
-
-        if (data)
-            send(socket, data, sizeof(data), 0);
+        serialize_value(insert_query.values[i], socket);
     }
 
 

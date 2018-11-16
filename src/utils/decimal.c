@@ -3,6 +3,7 @@
 //
 
 
+#include <float.h>
 #include "decimal.h"
 
 double read_double(char *buffer) {
