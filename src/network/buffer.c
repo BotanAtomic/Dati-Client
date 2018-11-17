@@ -4,9 +4,6 @@
 
 
 #include <malloc.h>
-#include <decimal.h>
-#include <variable.h>
-#include <sys/socket.h>
 #include <buffer.h>
 #include <shell.h>
 #include <netinet/in.h>
@@ -111,127 +108,163 @@ __uint64_t read_ulong(int socket) {
     return value;
 }
 
-value value_char(char c) {
-    value value = {"", CHAR, (void *) c};
-    return value;
-}
+void *valude_char(char c, char *var_name) {
+    value *value = malloc(sizeof(value));
 
-value value_uchar(unsigned char c) {
-    value value = {"", UCHAR, (void *) c};
-    return value;
-}
-
-value value_short(int16_t i) {
-    value value = {"", SHORT, (void *) i};
-    return value;
-}
-
-value value_ushort(uint16_t i) {
-    value value = {"", USHORT, (void *) i};
-    return value;
-}
-
-value value_long(int64_t i) {
-    value value = {"", LONG, (void *) i};
-    return value;
-}
-
-value value_ulong(uint64_t i) {
-    value value = {"", ULONG, (void *) i};
-    return value;
-}
-
-value value_int(int32_t i) {
-    value value = {"", INT, (void *) i};
-    return value;
-}
-
-value value_uint(uint32_t i) {
-    value value = {"", UINT, (void *) i};
-    return value;
-}
-
-value value_float(float f) {
-    char *buffer = malloc(4);
-    write_float(f, buffer);
-
-    value value = {"", DOUBLE, (void *) buffer};
-    return value;
-}
-
-value value_double(double d) {
-    char *buffer = malloc(8);
-    write_double(d, buffer);
-
-    value value = {"", DOUBLE, (void *) buffer};
+    value->key = var_name;
+    value->value = (void *) c;
+    value->type = CHAR;
 
     return value;
 }
 
-value value_string(char *s) {
-    value value = {"", STRING, (void *) s};
+value *value_uchar(unsigned char c, char *var_name) {
+    value *value = malloc(sizeof(value));
+
+    value->key = var_name;
+    value->value = (void *) c;
+    value->type = UCHAR;
+
+    return value;
+}
+
+value *value_short(int16_t i, char *var_name) {
+    value *value = malloc(sizeof(value));
+
+    value->key = var_name;
+    value->value = (void *) i;
+    value->type = SHORT;
+
+    return value;
+}
+
+value *value_ushort(uint16_t i, char *var_name) {
+    value *value = malloc(sizeof(value));
+
+    value->key = var_name;
+    value->value = (void *) i;
+    value->type = USHORT;
+
+    return value;
+}
+
+value *value_long(int64_t i, char *var_name) {
+    value *value = malloc(sizeof(value));
+
+    value->key = var_name;
+    value->value = (void *) i;
+    value->type = LONG;
+
+    return value;
+}
+
+value *value_ulong(uint64_t i, char *var_name) {
+    value *value = malloc(sizeof(value));
+
+    value->key = var_name;
+    value->value = (void *) i;
+    value->type = ULONG;
+
+    return value;
+}
+
+value *value_int(int32_t i, char *var_name) {
+    value *value = malloc(sizeof(value));
+
+    value->key = var_name;
+    value->value = (void *) i;
+    value->type = ULONG;
+
+    return value;
+}
+
+value *value_uint(uint32_t i, char *var_name) {
+    value *value = malloc(sizeof(value));
+
+    value->key = var_name;
+    value->value = (void *) i;
+    value->type = ULONG;
+
+    return value;
+}
+
+value *value_float(float f, char *var_name) {
+    return NULL;
+}
+
+value *value_double(double d, char *var_name) {
+    return NULL;
+
+}
+
+value *value_string(char *s, char *var_name) {
+    value *value = malloc(sizeof(value));
+
+    value->key = var_name;
+    value->value = (void *) var_name;
+    value->type = STRING;
+
     return value;
 }
 
 
-void serialize_value(value value, int socket) {
-    if (strlen(value.key) > 255)
+void serialize_value(value *value, int socket) {
+    if (strlen(value->key) > 255)
         return;
 
-    write_ushort((unsigned char) strlen(value.key), socket);
+    write_ushort((unsigned char) strlen(value->key), socket);
 
-    write_string(value.key, socket);
+    write_string(value->key, socket);
 
-    write_ubyte(value.type, socket);
+    write_ubyte(value->type, socket);
 
-    if (value.type == STRING) {
-        write_uint((uint32_t) strlen((const char *) value.value), socket);
+    if (value->type == STRING || value->type == FLOAT || value->type == DOUBLE) {
+        write_uint((uint32_t) strlen((const char *) value->value), socket);
     }
 
-    switch (value.type) {
+    switch (value->type) {
         case CHAR:
-            write_byte((char) value.value, socket);
+            write_byte((char) value->value, socket);
             break;
 
         case UCHAR:
-            write_ubyte((unsigned char) value.value, socket);
+            write_ubyte((unsigned char) value->value, socket);
             break;
 
         case SHORT:
-            write_short((int16_t) value.value, socket);
+            write_short((int16_t) value->value, socket);
             break;
 
         case USHORT:
-            write_ushort((uint16_t) value.value, socket);
+            write_ushort((uint16_t) value->value, socket);
             break;
 
         case INT:
-            write_int((int32_t) value.value, socket);
+            write_int((int32_t) value->value, socket);
             break;
 
         case UINT:
-            write_uint((uint32_t) value.value, socket);
+            write_uint((uint32_t) value->value, socket);
             break;
 
         case LONG:
-            write_long((int64_t) value.value, socket);
+            write_long((int64_t) value->value, socket);
             break;
 
         case ULONG:
-            write_ulong((uint64_t) value.value, socket);
+            write_ulong((uint64_t) value->value, socket);
             break;
 
         case FLOAT:
-            write_string((char *) value.value, socket);
+            write_string((char *) value->value, socket);
             break;
 
         case DOUBLE:
-            println("Double : %s", (char *) value.value);
-            write_string((char *) value.value, socket);
+            write_string((char *) value->value, socket);
             break;
 
         case STRING:
-            write_string((char *) value.value, socket);
+            write_string((char *) value->value, socket);
             break;
 
     }

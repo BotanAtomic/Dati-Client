@@ -7,7 +7,7 @@
 
 #include "client.h"
 #include "query.h"
-#include "container.h"
+#include "list.h"
 
 /** @Message_id : 0 **
  *  @Response : unsigned char : SUCCESS(1)/FAILED(0)
@@ -20,7 +20,7 @@ unsigned char login(client *client);
 /** @Message_id : 1 **
  *  @Response : *char[] : list of databases
 **/
-container get_databases(client client);
+list *get_databases(client client);
 
 /** @Message_id : 2 **
  *  @Response : unsigned char : SUCCESS(1)/FAILED(0) & unsigned char : error_code
@@ -42,7 +42,7 @@ unsigned char rename_database(client client, char *database, char *new_name);
 /** @Message_id : 5 **
  *  @Response : *char[] : list of tables of specified database
 **/
-container get_tables(client client, char *database);
+list *get_tables(client client, char *database);
 
 /** @Message_id : 6 **
  *  @Response : unsigned char : SUCCESS(1)/FAILED(0) & unsigned char : error_code
@@ -66,6 +66,6 @@ unsigned char rename_table(client client, char *database, char *last_name, char 
  *  @_uuid : unique id of inserted statement
 *  @Response : insert_result { @_uuid, @error_code }
 **/
-insert_result insert(client client, char *database, char *table, insert_query);
+insert_result insert(client client, char *database, char *table, list *);
 
 #endif //DATI_PROTOCOL_H

@@ -1,5 +1,4 @@
 #include <buffer.h>
-#include "container.h"
 #include "protocol.h"
 #include "shell.h"
 #include "query.h"
@@ -22,7 +21,6 @@ int main() {
           VERSION);
 
 
-
     client client;
     client.username = "root";
     client.password = "password";
@@ -36,31 +34,40 @@ int main() {
         if (response) {
             println("Return create database %d", create_database(client, "esgi"));
 
-            container database_container = get_databases(client);
-            for (int i = 0; i < database_container.length; i++) {
-                println("Database[%d] : '%s'", i, database_container.entities[i]);
+            list *database_container = get_databases(client);
+            element *element = database_container->element;
+
+            while (element != NULL) {
+                println("Database : '%s'", (char *) element->value);
+                element = element->next;
             }
+
+            list_free(database_container);
 
             println("Return create table %d", create_table(client, "esgi", "students"));
 
-            container table_container = get_tables(client, "esgi");
-            for (int i = 0; i < table_container.length; i++) {
-                println("Table[%d] : '%s'", i, table_container.entities[i]);
+            list *table_container = get_tables(client, "esgi");
+            element = table_container->element;
+            while (element != NULL) {
+                println("Table : '%s'", (char *) element->value);
+                element = element->next;
             }
 
+            list_free(table_container);
 
-            insert_query insert_query;
 
-            insert_append(&insert_query, "string", value_string("jerome"));
-            insert_append(&insert_query, "char", value_char(-127));
-            insert_append(&insert_query, "uchar", value_uchar(255));
-            insert_append(&insert_query, "short", value_short(26512));
-            insert_append(&insert_query, "ushort", value_ushort(12345));
-            insert_append(&insert_query, "int", value_int(-1234567));
-            insert_append(&insert_query, "uint", value_uint(1234567891));
-            insert_append(&insert_query, "long", value_long(-1234567891011121314));
-            insert_append(&insert_query, "ulong", value_ulong(123456789123456912));
-            insert_append(&insert_query, "double", value_double(123456789.123456789));
+            list *insert_query = list_create();
+
+            list_insert(insert_query, value_string("jerome", "string"));
+            list_insert(insert_query, value_char(-127, "char"));
+            list_insert(insert_query, value_uchar(255, "uchar"));
+            list_insert(insert_query, value_short(26512, "short"));
+            list_insert(insert_query, value_ushort(12345, "ushort"));
+            list_insert(insert_query, value_int(-1234567, "int"));
+            list_insert(insert_query, value_uint(1234567891, "uint"));
+            list_insert(insert_query, value_long(-1234567891011121314, "long"));
+            list_insert(insert_query, value_ulong(123456789123456912, "ulong"));
+
 
             insert(client, "esgi", "students", insert_query);
         }

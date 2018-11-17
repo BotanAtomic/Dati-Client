@@ -38,33 +38,30 @@ unsigned char login(struct client *client) {
     return 0;
 }
 
-container get_databases(struct client client) {
+list *get_databases(struct client client) {
     int socket = client.session.socket;
     write_ubyte(1, socket);
     write_ushort((__uint16_t) 0, socket);
 
-    container container = {};
+    list *container = list_create();
 
     if (read_ubyte(socket) == 1) {
         uint16_t databases_size = read_ushort(socket);
         uint16_t databases_count = read_ushort(socket);
 
-        container.length = databases_count;
-
-        char **databases = malloc(sizeof(char *) * databases_count);
+        container->length = databases_count;
 
         if (databases_count > 0) {
             char *token = strtok(read_string(databases_size, socket), "@");
 
             int i = 0;
             while (token != NULL) {
-                databases[i] = token;
+                list_insert(container, token);
                 token = strtok(NULL, "@");;
                 i++;
             }
         }
 
-        container.entities = databases;
     }
 
     return container;
@@ -135,35 +132,33 @@ unsigned char rename_database(struct client client, char *database, char *new_na
     return 0;
 }
 
-container get_tables(struct client client, char *database) {
+list *get_tables(struct client client, char *database) {
     int socket = client.session.socket;
 
     write_ubyte(5, socket);
     write_ushort((__uint16_t) strlen(database), socket);
     write_string(database, socket);
 
-    container container = {0, 0};
+    list *container = list_create();
 
     if (read_ubyte(socket) == 5) {
         uint16_t tables_size = read_ushort(socket);
         uint16_t tables_count = read_ushort(socket);
 
-        container.length = tables_count;
+        container->length = tables_count;
 
-        char **tables = malloc(sizeof(char *) * tables_count);
 
         if (tables_count > 0) {
             char *token = strtok(read_string(tables_size, socket), "@");
 
             int i = 0;
             while (token != NULL) {
-                tables[i] = token;
+                list_insert(container, token);
                 token = strtok(NULL, "@");;
                 i++;
             }
         }
 
-        container.entities = tables;
     }
 
     return container;
@@ -245,7 +240,7 @@ unsigned char rename_table(struct client client, char *database, char *last_name
     return 0;
 }
 
-insert_result insert(struct client client, char *database, char *table, insert_query insert_query) {
+insert_result insert(struct client client, char *database, char *table, list *insert_query) {
     int socket = client.session.socket;
 
     insert_result result = {0, 0};
@@ -258,12 +253,15 @@ insert_result insert(struct client client, char *database, char *table, insert_q
     write_ushort((__uint16_t) strlen(table), socket);
     write_string(table, socket);
 
-    write_ushort(insert_query.count, socket);
+    write_ushort(insert_query->length, socket);
 
-    for (int i = 0; i < insert_query.count; i++) {
-        serialize_value(insert_query.values[i], socket);
+
+    element *element = insert_query->element;
+
+    while (element != NULL) {
+        serialize_value((value *) element->value, socket);
+        element = element->next;
     }
-
 
     return result;
 }
