@@ -7,6 +7,7 @@
 #include <buffer.h>
 #include <shell.h>
 #include <netinet/in.h>
+#include <variable.h>
 
 #include "buffer.h"
 
@@ -108,8 +109,8 @@ __uint64_t read_ulong(int socket) {
     return value;
 }
 
-void *valude_char(char c, char *var_name) {
-    value *value = malloc(sizeof(value));
+node *value_char(char c, char *var_name) {
+    node *value = malloc(sizeof(value));
 
     value->key = var_name;
     value->value = (void *) c;
@@ -118,8 +119,8 @@ void *valude_char(char c, char *var_name) {
     return value;
 }
 
-value *value_uchar(unsigned char c, char *var_name) {
-    value *value = malloc(sizeof(value));
+node *value_uchar(unsigned char c, char *var_name) {
+    node *value = malloc(sizeof(value));
 
     value->key = var_name;
     value->value = (void *) c;
@@ -128,8 +129,8 @@ value *value_uchar(unsigned char c, char *var_name) {
     return value;
 }
 
-value *value_short(int16_t i, char *var_name) {
-    value *value = malloc(sizeof(value));
+node *value_short(int16_t i, char *var_name) {
+    node *value = malloc(sizeof(value));
 
     value->key = var_name;
     value->value = (void *) i;
@@ -138,8 +139,8 @@ value *value_short(int16_t i, char *var_name) {
     return value;
 }
 
-value *value_ushort(uint16_t i, char *var_name) {
-    value *value = malloc(sizeof(value));
+node *value_ushort(uint16_t i, char *var_name) {
+    node *value = malloc(sizeof(value));
 
     value->key = var_name;
     value->value = (void *) i;
@@ -148,8 +149,8 @@ value *value_ushort(uint16_t i, char *var_name) {
     return value;
 }
 
-value *value_long(int64_t i, char *var_name) {
-    value *value = malloc(sizeof(value));
+node *value_long(int64_t i, char *var_name) {
+    node *value = malloc(sizeof(value));
 
     value->key = var_name;
     value->value = (void *) i;
@@ -158,8 +159,8 @@ value *value_long(int64_t i, char *var_name) {
     return value;
 }
 
-value *value_ulong(uint64_t i, char *var_name) {
-    value *value = malloc(sizeof(value));
+node *value_ulong(uint64_t i, char *var_name) {
+    node *value = malloc(sizeof(value));
 
     value->key = var_name;
     value->value = (void *) i;
@@ -168,47 +169,47 @@ value *value_ulong(uint64_t i, char *var_name) {
     return value;
 }
 
-value *value_int(int32_t i, char *var_name) {
-    value *value = malloc(sizeof(value));
+node *value_int(int32_t i, char *var_name) {
+    node *value = malloc(sizeof(value));
 
     value->key = var_name;
     value->value = (void *) i;
-    value->type = ULONG;
+    value->type = INT;
 
     return value;
 }
 
-value *value_uint(uint32_t i, char *var_name) {
-    value *value = malloc(sizeof(value));
+node *value_uint(uint32_t i, char *var_name) {
+    node *value = malloc(sizeof(value));
 
     value->key = var_name;
     value->value = (void *) i;
-    value->type = ULONG;
+    value->type = UINT;
 
     return value;
 }
 
-value *value_float(float f, char *var_name) {
+node *value_float(float f, char *var_name) {
     return NULL;
 }
 
-value *value_double(double d, char *var_name) {
+node *value_double(double d, char *var_name) {
     return NULL;
 
 }
 
-value *value_string(char *s, char *var_name) {
-    value *value = malloc(sizeof(value));
+node *value_string(char *s, char *var_name) {
+    node *value = malloc(sizeof(value));
 
     value->key = var_name;
-    value->value = (void *) var_name;
+    value->value = (void *) s;
     value->type = STRING;
 
     return value;
 }
 
 
-void serialize_value(value *value, int socket) {
+void serialize_value(node *value, int socket) {
     if (strlen(value->key) > 255)
         return;
 

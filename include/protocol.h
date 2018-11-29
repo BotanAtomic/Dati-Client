@@ -16,7 +16,6 @@ unsigned char login(client *client);
 
 
 /*** DATABASES **/
-
 /** @Message_id : 1 **
  *  @Response : *char[] : list of databases
 **/
@@ -61,11 +60,10 @@ unsigned char rename_table(client client, char *database, char *last_name, char 
 
 
 /*** QUERY ***/
-
 /** @Message_id : 9 **
  *  @_uuid : unique id of inserted statement
 *  @Response : insert_result { @_uuid, @error_code }
 **/
-insert_result insert(client client, char *database, char *table, list *);
+insert_result insert(client client, char *database, char *table, list * insert_query);
 
 #endif //DATI_PROTOCOL_H

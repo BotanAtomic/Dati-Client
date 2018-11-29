@@ -22,6 +22,6 @@ typedef struct client {
     char *password;
 } client;
 
-unsigned char begin_connection(struct client *client);
+unsigned char begin_connection(client *client);
 
 #endif //DATI_CLIENT_H

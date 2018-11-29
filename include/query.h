@@ -5,8 +5,7 @@
 #ifndef DATI_QUERY_H
 #define DATI_QUERY_H
 
-#include "value.h"
-#include "list.h"
+#include "node.h"
 
 typedef struct insert_result {
     unsigned long _uuid;

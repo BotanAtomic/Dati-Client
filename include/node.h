@@ -5,13 +5,10 @@
 #ifndef DATI_VALUE_H
 #define DATI_VALUE_H
 
-#include <stdint.h>
-#include <variable.h>
-
-typedef struct value {
+typedef struct node {
     char *key;
-    var_type type;
+    unsigned char type;
     void *value;
-} value;
+} node;
 
 #endif //DATI_VALUE_H

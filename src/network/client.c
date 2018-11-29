@@ -3,11 +3,11 @@
 //
 
 #include <string.h>
-#include <shell.h>
+#include "shell.h"
 #include "client.h"
 
 
-unsigned char begin_connection(struct client *client) {
+unsigned char begin_connection(client *client) {
     struct sockaddr_in server_address;
     memset(&server_address, 0, sizeof(server_address));
     server_address.sin_family = AF_INET;

@@ -7,7 +7,8 @@
 
 
 #include <string.h>
-#include "value.h"
+#include <stdint.h>
+#include "node.h"
 
 void write_byte(char byte, int socket);
 
@@ -35,29 +36,29 @@ unsigned char read_ubyte(int socket);
 
 uint64_t read_ulong(int socket);
 
-value *value_char(char value, char *var_name);
+node *value_char(char value, char *var_name);
 
-value *value_uchar(unsigned char value, char *var_name);
+node *value_uchar(unsigned char value, char *var_name);
 
-value *value_short(int16_t value, char *var_name);
+node *value_short(int16_t value, char *var_name);
 
-value *value_ushort(uint16_t value, char *var_name);
+node *value_ushort(uint16_t value, char *var_name);
 
-value *value_int(int32_t value, char *var_name);
+node *value_int(int32_t value, char *var_name);
 
-value *value_uint(uint32_t value, char *var_name);
+node *value_uint(uint32_t value, char *var_name);
 
-value *value_long(int64_t value, char *var_name);
+node *value_long(int64_t value, char *var_name);
 
-value *value_ulong(uint64_t value, char *var_name);
+node *value_ulong(uint64_t value, char *var_name);
 
-value *value_float(float value, char *var_name);
+node *value_float(float value, char *var_name);
 
-value *value_double(double value, char *var_name);
+node *value_double(double value, char *var_name);
 
-value *value_string(char *value, char *var_name);
+node *value_string(char *value, char *var_name);
 
-void serialize_value(value *value, int socket);
+void serialize_value(node *value, int socket);
 
 
 #endif //DATI_BUFFER_H

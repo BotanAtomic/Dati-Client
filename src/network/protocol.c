@@ -26,10 +26,6 @@ unsigned char login(struct client *client) {
 
     write_string(credentials, socket);
 
-    println("Login '%s' / Password '%s' / Size : %d", client->username, client->password,
-            (user_length + password_length));
-
-
     if (read_ubyte(socket) == 0) {
         client->session.connected = read_ubyte(socket);
         return client->session.connected;
@@ -255,11 +251,10 @@ insert_result insert(struct client client, char *database, char *table, list *in
 
     write_ushort(insert_query->length, socket);
 
-
     element *element = insert_query->element;
 
-    while (element != NULL) {
-        serialize_value((value *) element->value, socket);
+    while (element) {
+        serialize_value((node *) element->value, socket);
         element = element->next;
     }
 
