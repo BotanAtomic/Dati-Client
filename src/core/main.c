@@ -81,7 +81,6 @@ int main() {
             print_tables(client, "esgi");
             print_tables(client, "sniffy");
 
-
             list *insert_query = list_create();
 
             list_insert(insert_query, value_string("jerome", "string"));
