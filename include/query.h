@@ -9,7 +9,7 @@
 
 typedef struct insert_result {
     unsigned long _uuid;
-    unsigned char error_code;
+    unsigned char errorCode;
 } insert_result;
 
 

@@ -14,14 +14,19 @@ typedef struct session {
 } session;
 
 typedef struct client {
-    struct session session;
+    session * session;
     char *host;
     uint16_t port;
-
     char *username;
     char *password;
+    unsigned char connected;
 } client;
 
-unsigned char begin_connection(client *client);
+client * newClient();
+
+unsigned char beginConnection(client *client);
+
+void setClientData(client* client, char * host, uint16_t port, char * username, char* password);
+
 
 #endif //DATI_CLIENT_H

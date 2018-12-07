@@ -11,93 +11,89 @@
 
 #include "buffer.h"
 
-void write_byte(char byte, int socket) {
+void writeByte(char byte, int socket) {
     send(socket, &byte, 1, 0);
 }
 
-void write_ubyte(unsigned char byte, int socket) {
+void writeUByte(unsigned char byte, int socket) {
     send(socket, &byte, 1, 0);
 }
 
 
-void write_short(int16_t short_value, int socket) {
+void writeShort(int16_t short_value, int socket) {
     char buffer[2];
 
-    buffer[0] = (char) (short_value >> 8);
-    buffer[1] = (char) (short_value);
+    memcpy(buffer, &short_value, 2);
 
     send(socket, buffer, 2, 0);
 }
 
 
-void write_ushort(__uint16_t u16, int socket) {
+void writeUShort(__uint16_t u16, int socket) {
     char buffer[2];
-    buffer[0] = (char) (u16);
-    buffer[1] = (char) ((u16 >> 8));
+
+    memcpy(buffer, &u16, 2);
+
     send(socket, buffer, 2, 0);
 }
 
-void write_string(char *str, int socket) {
+void writeString(char *str, int socket) {
     send(socket, str, strlen(str), 0);
 }
 
-void write_int(int32_t value, int socket) {
+void writeInt(int32_t value, int socket) {
     char buffer[4];
 
-    for (int i = 0; i < 4; i++)
-        buffer[i] = (char) ((value >> (8 * i)));
+    memcpy(buffer, &value, 4);
 
     send(socket, buffer, 4, 0);
 }
 
-void write_uint(__uint32_t value, int socket) {
+void writeUInt(__uint32_t value, int socket) {
     unsigned char buffer[4];
 
-    for (int i = 0; i < 4; i++)
-        buffer[i] = (unsigned char) ((value >> (8 * i)));
+    memcpy(buffer, &value, 4);
 
     send(socket, buffer, 4, 0);
 }
 
-void write_long(int64_t value, int socket) {
+void writeLong(int64_t value, int socket) {
     char buffer[8];
 
-    for (int i = 0; i < 8; i++)
-        buffer[i] = (char) ((value >> (8 * i)));
+    memcpy(buffer, &value, 8);
 
     send(socket, buffer, 8, 0);
 }
 
-void write_ulong(__uint64_t value, int socket) {
+void writeULong(__uint64_t value, int socket) {
     unsigned char buffer[8];
 
-    for (int i = 0; i < 8; i++)
-        buffer[i] = (unsigned char) ((value >> (8 * i)));
+    memcpy(buffer, &value, 8);
 
     send(socket, buffer, 8, 0);
 }
 
 
-char *read_string(size_t size, int socket) {
+char *readString(size_t size, int socket) {
     char *buffer = malloc(size + 1);
     recv(socket, buffer, size, 0);
     buffer[size] = '\0';
     return buffer;
 }
 
-__uint16_t read_ushort(int socket) {
+__uint16_t readUShort(int socket) {
     unsigned char buffer[2];
     recv(socket, buffer, 2, 0);
     return (__uint16_t) buffer[0] | ((__uint16_t) buffer[1] << 8);
 }
 
-unsigned char read_ubyte(int socket) {
+unsigned char readUByte(int socket) {
     unsigned char buffer;
     recv(socket, &buffer, 1, 0);
     return buffer;
 }
 
-__uint64_t read_ulong(int socket) {
+__uint64_t readLong(int socket) {
     unsigned char buffer[8];
     recv(socket, buffer, 8, 0);
 
@@ -109,96 +105,96 @@ __uint64_t read_ulong(int socket) {
     return value;
 }
 
-node *value_char(char c, char *var_name) {
+node *valueChar(char c, char *var_name) {
     node *value = malloc(sizeof(value));
 
     value->key = var_name;
-    value->value = (void *) c;
+    value->value = (void *) value;
     value->type = CHAR;
 
     return value;
 }
 
-node *value_uchar(unsigned char c, char *var_name) {
+node *valueUChar(unsigned char c, char *var_name) {
     node *value = malloc(sizeof(value));
 
     value->key = var_name;
-    value->value = (void *) c;
+    value->value = (void *) value;
     value->type = UCHAR;
 
     return value;
 }
 
-node *value_short(int16_t i, char *var_name) {
-    node *value = malloc(sizeof(value));
+node *valueShort(int16_t value, char *var_name) {
+    node *node = malloc(sizeof(node));
 
-    value->key = var_name;
-    value->value = (void *) i;
-    value->type = SHORT;
+    node->key = var_name;
+    node->value = (void *) value;
+    node->type = SHORT;
 
-    return value;
+    return node;
 }
 
-node *value_ushort(uint16_t i, char *var_name) {
-    node *value = malloc(sizeof(value));
+node *valueUShort(uint16_t value, char *var_name) {
+    node *node = malloc(sizeof(node));
 
-    value->key = var_name;
-    value->value = (void *) i;
-    value->type = USHORT;
+    node->key = var_name;
+    node->value = (void *) value;
+    node->type = USHORT;
 
-    return value;
+    return node;
 }
 
-node *value_long(int64_t i, char *var_name) {
-    node *value = malloc(sizeof(value));
+node *valueLong(int64_t value, char *var_name) {
+    node *node = malloc(sizeof(node));
 
-    value->key = var_name;
-    value->value = (void *) i;
-    value->type = LONG;
+    node->key = var_name;
+    node->value = (void *) value;
+    node->type = LONG;
 
-    return value;
+    return node;
 }
 
-node *value_ulong(uint64_t i, char *var_name) {
-    node *value = malloc(sizeof(value));
+node *valueULong(uint64_t value, char *var_name) {
+    node *node = malloc(sizeof(node));
 
-    value->key = var_name;
-    value->value = (void *) i;
-    value->type = ULONG;
+    node->key = var_name;
+    node->value = (void *) value;
+    node->type = ULONG;
 
-    return value;
+    return node;
 }
 
-node *value_int(int32_t i, char *var_name) {
-    node *value = malloc(sizeof(value));
+node *valueInt(int32_t value, char *var_name) {
+    node *node = malloc(sizeof(node));
 
-    value->key = var_name;
-    value->value = (void *) i;
-    value->type = INT;
+    node->key = var_name;
+    node->value = (void *) value;
+    node->type = INT;
 
-    return value;
+    return node;
 }
 
-node *value_uint(uint32_t i, char *var_name) {
-    node *value = malloc(sizeof(value));
+node *valueUint(uint32_t value, char *var_name) {
+    node *node = malloc(sizeof(node));
 
-    value->key = var_name;
-    value->value = (void *) i;
-    value->type = UINT;
+    node->key = var_name;
+    node->value = (void *) value;
+    node->type = UINT;
 
-    return value;
+    return node;
 }
 
-node *value_float(float f, char *var_name) {
+node *valueFloat(float f, char *var_name) {
     return NULL;
 }
 
-node *value_double(double d, char *var_name) {
+node *valueDouble(double d, char *var_name) {
     return NULL;
 
 }
 
-node *value_string(char *s, char *var_name) {
+node *valueString(char *s, char *var_name) {
     node *value = malloc(sizeof(value));
 
     value->key = var_name;
@@ -209,65 +205,64 @@ node *value_string(char *s, char *var_name) {
 }
 
 
-void serialize_value(node *value, int socket) {
+void serializeValue(node *value, int socket) {
     if (strlen(value->key) > 255)
         return;
 
-    write_ushort((unsigned char) strlen(value->key), socket);
+    writeUByte((unsigned char) strlen(value->key), socket);
 
-    write_string(value->key, socket);
+    writeString(value->key, socket);
 
-    write_ubyte(value->type, socket);
+    writeUByte(value->type, socket);
 
-    if (value->type == STRING || value->type == FLOAT || value->type == DOUBLE) {
-        write_uint((uint32_t) strlen((const char *) value->value), socket);
+    if (value->type == STRING) {
+        writeUInt((uint32_t) strlen((const char *) value->value), socket);
     }
 
     switch (value->type) {
         case CHAR:
-            write_byte((char) value->value, socket);
+            writeByte((char) value->value, socket);
             break;
 
         case UCHAR:
-            write_ubyte((unsigned char) value->value, socket);
+            writeUByte((unsigned char) value->value, socket);
             break;
 
         case SHORT:
-            write_short((int16_t) value->value, socket);
+            writeShort((int16_t) value->value, socket);
             break;
 
         case USHORT:
-            write_ushort((uint16_t) value->value, socket);
+            writeUShort((uint16_t) value->value, socket);
             break;
 
         case INT:
-            write_int((int32_t) value->value, socket);
+            writeInt((int32_t) value->value, socket);
             break;
 
         case UINT:
-            write_uint((uint32_t) value->value, socket);
+            writeUInt((uint32_t) value->value, socket);
             break;
 
         case LONG:
-            write_long((int64_t) value->value, socket);
+            writeLong((int64_t) value->value, socket);
             break;
 
         case ULONG:
-            write_ulong((uint64_t) value->value, socket);
+            writeULong((uint64_t) value->value, socket);
             break;
 
         case FLOAT:
-            write_string((char *) value->value, socket);
             break;
 
         case DOUBLE:
-            write_string((char *) value->value, socket);
             break;
 
         case STRING:
-            write_string((char *) value->value, socket);
+            writeString((char *) value->value, socket);
             break;
-
+        default:
+            break;
     }
 
 }

@@ -10,55 +10,57 @@
 #include <stdint.h>
 #include "node.h"
 
-void write_byte(char byte, int socket);
+static const unsigned char PRIMITIVE_SIZE[] = {1, 1, 2, 2, 4, 4, 8, 8, 0, 0, 0};
 
-void write_ubyte(unsigned char byte, int socket);
+void writeByte(char byte, int socket);
 
-void write_short(int16_t short_value, int socket);
+void writeUByte(unsigned char byte, int socket);
 
-void write_ushort(uint16_t u16, int socket);
+void writeShort(int16_t short_value, int socket);
 
-void write_int(int32_t value, int socket);
+void writeUShort(uint16_t u16, int socket);
 
-void write_uint(uint32_t value, int socket);
+void writeInt(int32_t value, int socket);
 
-void write_long(int64_t value, int socket);
+void writeUInt(uint32_t value, int socket);
 
-void write_ulong(uint64_t value, int socket);
+void writeLong(int64_t value, int socket);
 
-void write_string(char *str, int socket);
+void writeULong(uint64_t value, int socket);
 
-char *read_string(size_t size, int socket);
+void writeString(char *str, int socket);
 
-uint16_t read_ushort(int socket);
+char *readString(size_t size, int socket);
 
-unsigned char read_ubyte(int socket);
+uint16_t readUShort(int socket);
 
-uint64_t read_ulong(int socket);
+unsigned char readUByte(int socket);
 
-node *value_char(char value, char *var_name);
+uint64_t readLong(int socket);
 
-node *value_uchar(unsigned char value, char *var_name);
+node *valueChar(char value, char *var_name);
 
-node *value_short(int16_t value, char *var_name);
+node *valueUChar(unsigned char value, char *var_name);
 
-node *value_ushort(uint16_t value, char *var_name);
+node *valueShort(int16_t value, char *var_name);
 
-node *value_int(int32_t value, char *var_name);
+node *valueUShort(uint16_t value, char *var_name);
 
-node *value_uint(uint32_t value, char *var_name);
+node *valueInt(int32_t value, char *var_name);
 
-node *value_long(int64_t value, char *var_name);
+node *valueUint(uint32_t value, char *var_name);
 
-node *value_ulong(uint64_t value, char *var_name);
+node *valueLong(int64_t value, char *var_name);
 
-node *value_float(float value, char *var_name);
+node *valueULong(uint64_t value, char *var_name);
 
-node *value_double(double value, char *var_name);
+node *valueFloat(float value, char *var_name);
 
-node *value_string(char *value, char *var_name);
+node *valueDouble(double value, char *var_name);
 
-void serialize_value(node *value, int socket);
+node *valueString(char *value, char *var_name);
+
+void serializeValue(node *value, int socket);
 
 
 #endif //DATI_BUFFER_H

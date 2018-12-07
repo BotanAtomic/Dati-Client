@@ -3,11 +3,13 @@
 //
 
 #include <string.h>
+#include <client.h>
+#include <malloc.h>
+
 #include "shell.h"
 #include "client.h"
 
-
-unsigned char begin_connection(client *client) {
+unsigned char beginConnection(client *client) {
     struct sockaddr_in server_address;
     memset(&server_address, 0, sizeof(server_address));
     server_address.sin_family = AF_INET;
@@ -18,20 +20,35 @@ unsigned char begin_connection(client *client) {
 
     int sock;
     if ((sock = socket(PF_INET, SOCK_STREAM, 0)) < 0) {
-        print("Could not create socket [%s:%d]", client->host, client->port);
         return 0;
     }
 
     if (connect(sock, (struct sockaddr *) &server_address,
                 sizeof(server_address)) < 0) {
-        print("Could not create socket [%s:%d]", client->host, client->port);
         return 0;
     }
 
-    println("Successfully connected to database server [%s:%d]", client->host, client->port);
-
-    client->session.socket = sock;
+    client->connected = 1;
+    client->session->socket = sock;
 
     return 1;
+}
+
+client *newClient() {
+    client * client = malloc(sizeof(*client));
+    client->session = malloc(sizeof(session));
+    client->connected = 0;
+    return client;
+}
+
+void setClientData(client *client, char *host, uint16_t port, char *username, char *password) {
+    client->host = malloc(strlen(host) + 1);
+    client->port = port;
+    client->username = malloc(strlen(username) + 1);
+    client->password = malloc(strlen(password) + 1);
+
+    strcpy(client->host, host);
+    strcpy(client->password, password);
+    strcpy(client->username, username);
 }
 

@@ -18,11 +18,13 @@ typedef struct list {
 } list;
 
 
-list *list_create();
+list *listCreate();
 
-void list_insert(list *list, void *value);
+void listInsert(list *list, void *value);
 
-void list_free(list *list);
+void * listGet(list *list, int index);
+
+void listFree(list *list);
 
 
 #endif //DATI_LIST_H

@@ -2,9 +2,11 @@
 // Created by Botan on 17/11/18.
 //
 
+#include <list.h>
+
 #include "list.h"
 
-list *list_create() {
+list *listCreate() {
     list *list = malloc(sizeof(*list));
 
     if (list) {
@@ -17,7 +19,7 @@ list *list_create() {
 }
 
 
-void list_insert(list *list, void *value) {
+void listInsert(list *list, void *value) {
     element *new_element = malloc(sizeof(*new_element));
     if (list && new_element) {
         new_element->value = value;
@@ -27,13 +29,27 @@ void list_insert(list *list, void *value) {
     }
 }
 
-void list_free(list * list) {
-    element * element = list->element;
-    while(element != NULL) {
+void listFree(list *list) {
+    element *element = list->element;
+    while (element != NULL) {
         free(element);
         element = element->next;
     }
 
     free(list);
+}
+
+void *listGet(list *list, int index) {
+    element *element = list->element;
+    int i = 0;
+    while (element != NULL) {
+        if (i == index)
+            return element->value;
+
+        element = element->next;
+        i++;
+    }
+
+    return NULL;
 }
 
