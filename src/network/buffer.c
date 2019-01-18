@@ -22,18 +22,14 @@ void writeUByte(unsigned char byte, int socket) {
 
 void writeShort(int16_t short_value, int socket) {
     char buffer[2];
-
     memcpy(buffer, &short_value, 2);
-
     send(socket, buffer, 2, 0);
 }
 
 
 void writeUShort(__uint16_t u16, int socket) {
     char buffer[2];
-
     memcpy(buffer, &u16, 2);
-
     send(socket, buffer, 2, 0);
 }
 
@@ -93,111 +89,121 @@ unsigned char readUByte(int socket) {
     return buffer;
 }
 
-__uint64_t readLong(int socket) {
+__uint32_t readUInt(int socket) {
+    unsigned char buffer[4];
+    recv(socket, buffer, 4, 0);
+
+    __uint32_t value = 0;
+
+    memcpy(&value, buffer, 4);
+
+    return value;
+}
+
+__uint64_t readULong(int socket) {
     unsigned char buffer[8];
     recv(socket, buffer, 8, 0);
 
     __uint64_t value = 0;
 
-    for (int i = 0; i < 8; i++)
-        value += (buffer[i] << (8 * i));
+    memcpy(&value, buffer, 8);
 
     return value;
 }
 
-node *valueChar(char c, char *var_name) {
-    node *value = malloc(sizeof(value));
+Node *valueChar(char c, char *varName) {
+    Node *value = malloc(sizeof(value));
 
-    value->key = var_name;
-    value->value = (void *) value;
+    value->key = varName;
+    value->value = (void *) c;
     value->type = CHAR;
 
     return value;
 }
 
-node *valueUChar(unsigned char c, char *var_name) {
-    node *value = malloc(sizeof(value));
+Node *valueUChar(unsigned char c, char *varName) {
+    Node *value = malloc(sizeof(value));
 
-    value->key = var_name;
-    value->value = (void *) value;
+    value->key = varName;
+    value->value = (void *) c;
     value->type = UCHAR;
 
     return value;
 }
 
-node *valueShort(int16_t value, char *var_name) {
-    node *node = malloc(sizeof(node));
+Node *valueShort(int16_t value, char *varName) {
+    Node *node = malloc(sizeof(node));
 
-    node->key = var_name;
+    node->key = varName;
     node->value = (void *) value;
     node->type = SHORT;
 
     return node;
 }
 
-node *valueUShort(uint16_t value, char *var_name) {
-    node *node = malloc(sizeof(node));
+Node *valueUShort(uint16_t value, char *varName) {
+    Node *node = malloc(sizeof(node));
 
-    node->key = var_name;
+    node->key = varName;
     node->value = (void *) value;
     node->type = USHORT;
 
     return node;
 }
 
-node *valueLong(int64_t value, char *var_name) {
-    node *node = malloc(sizeof(node));
+Node *valueLong(int64_t value, char *varName) {
+    Node *node = malloc(sizeof(node));
 
-    node->key = var_name;
+    node->key = varName;
     node->value = (void *) value;
     node->type = LONG;
 
     return node;
 }
 
-node *valueULong(uint64_t value, char *var_name) {
-    node *node = malloc(sizeof(node));
+Node *valueULong(uint64_t value, char *varName) {
+    Node *node = malloc(sizeof(node));
 
-    node->key = var_name;
+    node->key = varName;
     node->value = (void *) value;
     node->type = ULONG;
 
     return node;
 }
 
-node *valueInt(int32_t value, char *var_name) {
-    node *node = malloc(sizeof(node));
+Node *valueInt(int32_t value, char *varName) {
+    Node *node = malloc(sizeof(node));
 
-    node->key = var_name;
+    node->key = varName;
     node->value = (void *) value;
     node->type = INT;
 
     return node;
 }
 
-node *valueUint(uint32_t value, char *var_name) {
-    node *node = malloc(sizeof(node));
+Node *valueUint(uint32_t value, char *varName) {
+    Node *node = malloc(sizeof(node));
 
-    node->key = var_name;
+    node->key = varName;
     node->value = (void *) value;
     node->type = UINT;
 
     return node;
 }
 
-node *valueFloat(float f, char *var_name) {
+Node *valueFloat(float f, char *varName) {
     return NULL;
 }
 
-node *valueDouble(double d, char *var_name) {
+Node *valueDouble(double d, char *varName) {
     return NULL;
 
 }
 
-node *valueString(char *s, char *var_name) {
-    node *value = malloc(sizeof(value));
+Node *valueString(char *s, char *varName) {
+    Node *value = malloc(sizeof(value));
 
-    value->key = var_name;
+    value->key = varName;
     value->value = (void *) s;
     value->type = STRING;
 
@@ -205,7 +211,7 @@ node *valueString(char *s, char *var_name) {
 }
 
 
-void serializeValue(node *value, int socket) {
+void serializeValue(Node *value, int socket) {
     if (strlen(value->key) > 255)
         return;
 
@@ -265,4 +271,54 @@ void serializeValue(node *value, int socket) {
             break;
     }
 
+
+}
+
+
+int16_t getShort(const char *buffer) {
+    int16_t value = 0;
+
+    memcpy(&value, buffer, 2);
+
+    return value;
+}
+
+__uint16_t getUShort(const char *buffer) {
+    __uint16_t value = 0;
+
+    memcpy(&value, buffer, 2);
+
+    return value;
+}
+
+__uint32_t getUInt(const char *buffer) {
+    __uint32_t value = 0;
+
+    memcpy(&value, buffer, 4);
+
+    return value;
+}
+
+int32_t getInt(const char *buffer) {
+    int32_t value = 0;
+
+    memcpy(&value, buffer, 4);
+
+    return value;
+}
+
+__uint64_t getULong(const char *buffer) {
+    __uint64_t value = 0;
+
+    memcpy(&value, buffer, 8);
+
+    return value;
+}
+
+int64_t getLong(const char *buffer) {
+    int64_t value = 0;
+
+    memcpy(&value, buffer, 8);
+
+    return value;
 }

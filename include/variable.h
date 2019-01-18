@@ -19,4 +19,6 @@ typedef enum var_type {
     STRING
 } var_type;
 
+
+
 #endif //DATI_VARIABLE_H

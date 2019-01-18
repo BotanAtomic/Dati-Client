@@ -3,47 +3,13 @@
 #include "protocol.h"
 #include "shell.h"
 #include "query.h"
+#include "utils.h"
 
 #define VERSION "0.0.10"
 
 #define SHELL_MODE 0
 
-void printDatabases(client *client) {
-    list *databases = getDatabases(client);
-    element *element = databases->element;
-
-    println("Databases {");
-
-    int i = 0;
-    while (element) {
-        println("\t%d : '%s'", i++, (char *) element->value);
-        element = element->next;
-    }
-
-    println("}\n");
-
-    listFree(databases);
-}
-
-void printTables(client *client, char *database) {
-    list *tables = getTables(client, database);
-    element *element = tables->element;
-
-    println("Tables of databases [%s] {", database);
-
-    int i = 0;
-    while (element) {
-        println("\t%d : '%s'", i++, (char *) element->value);
-        element = element->next;
-    }
-
-    println("}\n");
-
-    listFree(tables);
-}
-
-
-int main() {
+int main(int argc, char *argv[]) {
     print("      ___           ___           ___           ___           ___           ___     \n"
           "     /\\  \\         /\\  \\         /\\  \\         /\\__\\         /\\  \\         /\\__\\    \n"
           "    /::\\  \\       /::\\  \\        \\:\\  \\       /:/  /        /::\\  \\       /:/  /    \n"
@@ -57,11 +23,11 @@ int main() {
           "     ~~            \\/__/     \\/__/             \\/__/         \\/__/         \\|__|    \n\nAPI v %s\n\n",
           VERSION);
 
-    if (SHELL_MODE) {
+    if (SHELL_MODE || (argc > 1 && !strcmp(argv[1], "shell:on"))) {
         listenCommand();
     }
 
-    client *client = newClient();
+    Client *client = newClient();
     setClientData(client, "localhost", 6999, "root", "password");
 
     if (beginConnection(client)) {
@@ -69,38 +35,30 @@ int main() {
         println("Login response : %s", (client->session->connected ? "SUCCESS" : "FAILED"));
 
         if (response) {
-            println("Return create database : %d", createDatabase(client, "esgi"));
-            println("Return create database : %d", createDatabase(client, "sniffy"));
+            char *strings[10] = {"albert", "botan", "test", "goran", "dlovan", "karzan", "clement", "huit", "gurvan",
+                                 "simon"};
 
-            println("Return create table : %d", createTable(client, "esgi", "students"));
+            for (int i = 0; i < 1000; i++) {
+                List *query = createList();
 
-            println("Return create table : %d", createTable(client, "sniffy", "performance"));
-            println("Return create table : %d", createTable(client, "sniffy", "nodes"));
-            println("Return create table : %d", createTable(client, "sniffy", "media"));
-            println("Return create table : %d", createTable(client, "sniffy", "users"));
+                listInsert(query, valueString(strings[i % 10], "test_string"));
+                listInsert(query, valueChar(-45, "test_char"));
+                listInsert(query, valueUChar(200, "test_uchar"));
+                listInsert(query, valueShort(-12345, "test_short"));
+                listInsert(query, valueUShort(12345, "test_ushort"));
+                listInsert(query, valueInt(-123456789, "test_int"));
+                listInsert(query, valueUint(123456789, "test_uint"));
+                listInsert(query, valueLong(-1234567891011121314, "test_long"));
+                listInsert(query, valueULong(1234567891011121314, "test_ulong"));
 
-            printDatabases(client);
+                InsertResult result = insertValue(client, "esgi", "students", query, ASYNC);
 
-            printTables(client, "esgi");
-            printTables(client, "sniffy");
-
-            for (int i = 0; i < 1; i++) {
-                list *query = listCreate();
-
-                listInsert(query, valueString("jerome", "string"));
-                listInsert(query, valueChar('B', "char"));
-                listInsert(query, valueUChar(255, "uchar"));
-                listInsert(query, valueShort(26512, "short"));
-                listInsert(query, valueUShort(12345, "ushort"));
-                listInsert(query, valueInt(-1234567, "int"));
-                listInsert(query, valueUint(1234567891, "uint"));
-                listInsert(query, valueLong(-1234567891011121314, "long"));
-                listInsert(query, valueULong(123456789123456912, "ulong"));
-
-                insertValue(client, "esgi", "students", query);
+                if (result._uuid < 1) {
+                    println("Return insert values : ERROR[%d]", result.errorCode);
+                } else {
+                    println("Return insert values : UUID[%lu]", result._uuid);
+                }
             }
-
-
         }
     }
 

@@ -4,9 +4,14 @@
 #include <buffer.h>
 #include <shell.h>
 #include <malloc.h>
+#include <protocol.h>
+#include <variable.h>
+
 #include "protocol.h"
 
-unsigned char login(client *client) {
+#define INT2VOIDP(i) (void*)(uintptr_t)(i)
+
+unsigned char login(Client *client) {
     int socket = client->session->socket;
 
     writeUByte(0, socket);
@@ -34,12 +39,12 @@ unsigned char login(client *client) {
     return 0;
 }
 
-list *getDatabases(client *client) {
+List *getDatabases(Client *client) {
     int socket = client->session->socket;
     writeUByte(1, socket);
     writeUShort((__uint16_t) 0, socket);
 
-    list *container = listCreate();
+    List *container = createList();
 
     if (readUByte(socket) == 1) {
         uint16_t databases_size = readUShort(socket);
@@ -63,7 +68,7 @@ list *getDatabases(client *client) {
     return container;
 }
 
-unsigned char createDatabase(client *client, char *name) {
+unsigned char createDatabase(Client *client, char *name) {
     int socket = client->session->socket;
 
     writeUByte(2, socket);
@@ -84,7 +89,7 @@ unsigned char createDatabase(client *client, char *name) {
     return 0;
 }
 
-unsigned char removeDatabase(client *client, char *name) {
+unsigned char removeDatabase(Client *client, char *name) {
     int socket = client->session->socket;
 
     writeUByte(3, socket);
@@ -105,7 +110,7 @@ unsigned char removeDatabase(client *client, char *name) {
     return 0;
 }
 
-unsigned char renameDatabase(client *client, char *database, char *new_name) {
+unsigned char renameDatabase(Client *client, char *database, char *new_name) {
     int socket = client->session->socket;
 
     writeUByte(4, socket);
@@ -128,14 +133,14 @@ unsigned char renameDatabase(client *client, char *database, char *new_name) {
     return 0;
 }
 
-list *getTables(client *client, char *database) {
+List *getTables(Client *client, char *database) {
     int socket = client->session->socket;
 
     writeUByte(5, socket);
     writeUShort((__uint16_t) strlen(database), socket);
     writeString(database, socket);
 
-    list *container = listCreate();
+    List *container = createList();
 
     if (readUByte(socket) == 5) {
         uint16_t tables_size = readUShort(socket);
@@ -160,7 +165,7 @@ list *getTables(client *client, char *database) {
     return container;
 }
 
-unsigned char createTable(client *client, char *database, char *name) {
+unsigned char createTable(Client *client, char *database, char *name) {
     int socket = client->session->socket;
 
     writeUByte(6, socket);
@@ -185,7 +190,7 @@ unsigned char createTable(client *client, char *database, char *name) {
     return 0;
 }
 
-unsigned char removeTable(client *client, char *database, char *name) {
+unsigned char removeTable(Client *client, char *database, char *name) {
     int socket = client->session->socket;
 
     writeUByte(7, socket);
@@ -209,7 +214,7 @@ unsigned char removeTable(client *client, char *database, char *name) {
     return 0;
 }
 
-unsigned char renameTable(client *client, char *database, char *last_name, char *new_name) {
+unsigned char renameTable(Client *client, char *database, char *last_name, char *new_name) {
     int socket = client->session->socket;
 
     writeUByte(8, socket);
@@ -236,10 +241,10 @@ unsigned char renameTable(client *client, char *database, char *last_name, char 
     return 0;
 }
 
-insert_result insertValue(client *client, char *database, char *table, list *insert_query) {
+InsertResult insertValue(Client *client, char *database, char *table, List *insertQuery, char async) {
     int socket = client->session->socket;
 
-    insert_result result = {0, 0};
+    InsertResult result = {0, 0};
 
     writeUByte(9, socket);
 
@@ -248,16 +253,107 @@ insert_result insertValue(client *client, char *database, char *table, list *ins
 
     writeUShort((__uint16_t) strlen(table), socket);
     writeString(table, socket);
+    writeUByte((unsigned char) async, socket);
 
-    writeUShort(insert_query->length, socket);
+    writeUShort(insertQuery->length, socket);
 
-    element *element = insert_query->element;
+    Element *element = insertQuery->element;
 
     while (element) {
-        serializeValue((node *) element->value, socket);
+        serializeValue((Node *) element->value, socket);
         element = element->next;
     }
 
+    if (!async) {
+        unsigned char response = readUByte(socket);
+
+        if (response == 1)
+            result._uuid = readULong(socket);
+        else
+            result.errorCode = readUByte(socket);
+    }
+
+
     return result;
+}
+
+List *find(Client *client, char *database, char *table, void (*callback)(TableValue *), char *filter) {
+    int socket = client->session->socket;
+
+    writeUByte(10, socket);
+
+    writeUShort((__uint16_t) strlen(database), socket);
+    writeString(database, socket);
+
+    writeUShort((__uint16_t) strlen(table), socket);
+    writeString(table, socket);
+
+    writeUByte((unsigned char) strlen(filter), socket);
+    writeString(filter, socket);
+
+    List *tables = createList();
+
+    for (unsigned char response = readUByte(socket); response > 0; response = readUByte(socket)) {
+        TableValue *tableValue = malloc(sizeof(TableValue));
+        uint16_t nodesLength = readUShort(socket);
+        uint64_t uuid = readULong(socket);
+
+        if (tableValue) {
+            tableValue->nodes = createList();
+            tableValue->_uuid = uuid;
+
+            for (int i = 0; tableValue->nodes && i < nodesLength; i++) {
+                Node *node = malloc(sizeof(Node));
+                if (node) {
+                    char *key = readString(readUByte(socket), socket);
+                    unsigned char type = readUByte(socket);
+                    uint32_t dataLength = PRIMITIVE_SIZE[type];
+
+                    if (!dataLength)
+                        dataLength = readUInt(socket);
+
+                    node->key = key;
+                    node->type = type;
+                    node->length = dataLength;
+                    node->value = malloc(dataLength);
+
+                    char *data = malloc(dataLength);
+                    recv(socket, data, dataLength, 0);
+
+                    if (type == CHAR || type == UCHAR || type == STRING) {
+                        if (type == STRING) {
+                            node->value = malloc(dataLength + 1);
+                            strcpy(node->value, data);
+                            ((char *) node->value)[dataLength] = 0;
+                        } else {
+                            char c = data[0];
+                            node->value = INT2VOIDP(c);
+                        }
+                    } else {
+                        node->value = VAR_PARSER[type](data);
+                    }
+
+                    free(data);
+
+                } else {
+                    printf("No more memory available");
+                }
+
+
+                listInsert(tableValue->nodes, node);
+            }
+        } else {
+            printf("No more memory available");
+        }
+
+
+        if (callback != NULL)
+            callback(tableValue);
+
+        listInsert(tables, tableValue);
+    }
+
+
+    return tables;
 }
 

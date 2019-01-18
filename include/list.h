@@ -7,24 +7,24 @@
 
 #include <malloc.h>
 
-typedef struct element {
+typedef struct Element {
     void *value;
-    struct element *next;
-} element;
+    struct Element *next;
+} Element;
 
-typedef struct list {
-    element *element;
+typedef struct List {
+    Element *element;
     __uint16_t length;
-} list;
+} List;
 
 
-list *listCreate();
+List *createList();
 
-void listInsert(list *list, void *value);
+void listInsert(List *list, void *value);
 
-void * listGet(list *list, int index);
+void * listGet(List *list, int index);
 
-void listFree(list *list);
+void listFree(List *list);
 
 
 #endif //DATI_LIST_H

@@ -10,6 +10,7 @@ include_directories(include lib)
 
 add_executable(Dati src/core/main.c src/network/client.c include/client.h src/network/protocol.c
         include/protocol.h src/network/buffer.c include/buffer.h src/shell/shell.c include/shell.h
-        include/query.h include/node.h include/variable.h include/list.h src/list/list.c src/command/command.c include/command.h)
+        include/query.h include/node.h include/variable.h include/list.h src/list/list.c
+        src/command/command.c include/command.h include/utils.h src/utils/utils.c)
 
 target_link_libraries(Dati json-c)

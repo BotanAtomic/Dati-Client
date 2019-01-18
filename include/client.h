@@ -8,25 +8,25 @@
 
 #include <arpa/inet.h>
 
-typedef struct session {
+typedef struct Session {
     unsigned char connected;
     int socket;
-} session;
+} Session;
 
-typedef struct client {
-    session * session;
+typedef struct Client {
+    Session * session;
     char *host;
     uint16_t port;
     char *username;
     char *password;
     unsigned char connected;
-} client;
+} Client;
 
-client * newClient();
+Client * newClient();
 
-unsigned char beginConnection(client *client);
+unsigned char beginConnection(Client *client);
 
-void setClientData(client* client, char * host, uint16_t port, char * username, char* password);
+void setClientData(Client* client, char * host, uint16_t port, char * username, char* password);
 
 
 #endif //DATI_CLIENT_H

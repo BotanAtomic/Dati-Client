@@ -3,28 +3,27 @@
 //
 
 #include <string.h>
-#include <client.h>
 #include <malloc.h>
 
 #include "shell.h"
 #include "client.h"
 
-unsigned char beginConnection(client *client) {
-    struct sockaddr_in server_address;
-    memset(&server_address, 0, sizeof(server_address));
-    server_address.sin_family = AF_INET;
+unsigned char beginConnection(Client *client) {
+    struct sockaddr_in serverAddress;
+    memset(&serverAddress, 0, sizeof(serverAddress));
+    serverAddress.sin_family = AF_INET;
 
-    inet_pton(AF_INET, client->host, &server_address.sin_addr);
+    inet_pton(AF_INET, client->host, &serverAddress.sin_addr);
 
-    server_address.sin_port = htons(client->port);
+    serverAddress.sin_port = htons(client->port);
 
     int sock;
     if ((sock = socket(PF_INET, SOCK_STREAM, 0)) < 0) {
         return 0;
     }
 
-    if (connect(sock, (struct sockaddr *) &server_address,
-                sizeof(server_address)) < 0) {
+    if (connect(sock, (struct sockaddr *) &serverAddress,
+                sizeof(serverAddress)) < 0) {
         return 0;
     }
 
@@ -34,14 +33,14 @@ unsigned char beginConnection(client *client) {
     return 1;
 }
 
-client *newClient() {
-    client * client = malloc(sizeof(*client));
-    client->session = malloc(sizeof(session));
+Client *newClient() {
+    Client * client = malloc(sizeof(*client));
+    client->session = malloc(sizeof(Session));
     client->connected = 0;
     return client;
 }
 
-void setClientData(client *client, char *host, uint16_t port, char *username, char *password) {
+void setClientData(Client *client, char *host, uint16_t port, char *username, char *password) {
     client->host = malloc(strlen(host) + 1);
     client->port = port;
     client->username = malloc(strlen(username) + 1);

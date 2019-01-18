@@ -5,12 +5,10 @@
 #ifndef DATI_QUERY_H
 #define DATI_QUERY_H
 
-#include "node.h"
-
-typedef struct insert_result {
-    unsigned long _uuid;
+typedef struct InsertResult {
+    uint64_t _uuid;
     unsigned char errorCode;
-} insert_result;
+} InsertResult;
 
 
 #endif //DATI_QUERY_H
