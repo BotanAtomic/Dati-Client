@@ -14,6 +14,8 @@ void printDatabases(Client *);
 
 void printTables(Client *, char *);
 
+void showHelp();
+
 char * errorToString(unsigned char);
 
 #endif //DATI_UTILS_H

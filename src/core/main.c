@@ -1,3 +1,5 @@
+#include <stdlib.h>
+
 #include "command.h"
 #include "buffer.h"
 #include "protocol.h"
@@ -10,21 +12,24 @@
 #define SHELL_MODE 0
 
 int main(int argc, char *argv[]) {
-    print("      ___           ___           ___           ___           ___           ___     \n"
-          "     /\\  \\         /\\  \\         /\\  \\         /\\__\\         /\\  \\         /\\__\\    \n"
-          "    /::\\  \\       /::\\  \\        \\:\\  \\       /:/  /        /::\\  \\       /:/  /    \n"
-          "   /:/\\:\\  \\     /:/\\:\\  \\        \\:\\  \\     /:/  /        /:/\\:\\  \\     /:/__/     \n"
-          "  /:/  \\:\\__\\   /::\\~\\:\\  \\       /::\\  \\   /:/  /  ___   /::\\~\\:\\  \\   /::\\__\\____ \n"
-          " /:/__/ \\:|__| /:/\\:\\ \\:\\__\\     /:/\\:\\__\\ /:/__/  /\\__\\ /:/\\:\\ \\:\\__\\ /:/\\:::::\\__\\\n"
-          " \\:\\  \\ /:/  / \\/__\\:\\/:/  /    /:/  \\/__/ \\:\\  \\ /:/  / \\/__\\:\\/:/  / \\/_|:|~~|~   \n"
-          "  \\:\\  /:/  /       \\::/  /    /:/  /       \\:\\  /:/  /       \\::/  /     |:|  |    \n"
-          "   \\:\\/:/  /        /:/  /    /:/  /         \\:\\/:/  /        /:/  /      |:|  |    \n"
-          "    \\::/__/        /:/  /    /:/  /           \\::/  /        /:/  /       |:|  |    \n"
-          "     ~~            \\/__/     \\/__/             \\/__/         \\/__/         \\|__|    \n\nAPI v %s\n\n",
-          VERSION);
+    setColor(CYAN);
+    println("      ___           ___           ___           ___           ___           ___     \n"
+            "     /\\  \\         /\\  \\         /\\  \\         /\\__\\         /\\  \\         /\\__\\    \n"
+            "    /::\\  \\       /::\\  \\        \\:\\  \\       /:/  /        /::\\  \\       /:/  /    \n"
+            "   /:/\\:\\  \\     /:/\\:\\  \\        \\:\\  \\     /:/  /        /:/\\:\\  \\     /:/__/     \n"
+            "  /:/  \\:\\__\\   /::\\~\\:\\  \\       /::\\  \\   /:/  /  ___   /::\\~\\:\\  \\   /::\\__\\____ \n"
+            " /:/__/ \\:|__| /:/\\:\\ \\:\\__\\     /:/\\:\\__\\ /:/__/  /\\__\\ /:/\\:\\ \\:\\__\\ /:/\\:::::\\__\\\n"
+            " \\:\\  \\ /:/  / \\/__\\:\\/:/  /    /:/  \\/__/ \\:\\  \\ /:/  / \\/__\\:\\/:/  / \\/_|:|~~|~   \n"
+            "  \\:\\  /:/  /       \\::/  /    /:/  /       \\:\\  /:/  /       \\::/  /     |:|  |    \n"
+            "   \\:\\/:/  /        /:/  /    /:/  /         \\:\\/:/  /        /:/  /      |:|  |    \n"
+            "    \\::/__/        /:/  /    /:/  /           \\::/  /        /:/  /       |:|  |    \n"
+            "     ~~            \\/__/     \\/__/             \\/__/         \\/__/         \\|__|    \n");
+
+    println("Version : %s\n", VERSION);
 
     if (SHELL_MODE || (argc > 1 && !strcmp(argv[1], "shell:on"))) {
         listenCommand();
+        exit(EXIT_SUCCESS);
     }
 
     Client *client = newClient();
@@ -34,9 +39,12 @@ int main(int argc, char *argv[]) {
         unsigned char response = login(client);
         println("Login response : %s", (client->session->connected ? "SUCCESS" : "FAILED"));
 
+
         if (response) {
             char *strings[10] = {"albert", "botan", "test", "goran", "dlovan", "karzan", "clement", "huit", "gurvan",
                                  "simon"};
+
+            char insertMethod = ASYNC;
 
             for (int i = 0; i < 1000; i++) {
                 List *query = createList();
@@ -51,12 +59,14 @@ int main(int argc, char *argv[]) {
                 listInsert(query, valueLong(-1234567891011121314, "test_long"));
                 listInsert(query, valueULong(1234567891011121314, "test_ulong"));
 
-                InsertResult result = insertValue(client, "esgi", "students", query, ASYNC);
+                InsertResult result = insertValue(client, "esgi", "students", query, insertMethod);
 
-                if (result._uuid < 1) {
-                    println("Return insert values : ERROR[%d]", result.errorCode);
-                } else {
-                    println("Return insert values : UUID[%lu]", result._uuid);
+                if (insertMethod != ASYNC) {
+                    if (result._uuid < 1) {
+                        println("Return insert values : ERROR[%d]", result.errorCode);
+                    } else {
+                        println("Return insert values : UUID[%lu]", result._uuid);
+                    }
                 }
             }
         }
