@@ -44,9 +44,9 @@ int main(int argc, char *argv[]) {
             char *strings[10] = {"albert", "botan", "test", "goran", "dlovan", "karzan", "clement", "huit", "gurvan",
                                  "simon"};
 
-            char insertMethod = ASYNC;
+            char insertMethod = SYNC;
 
-            for (int i = 0; i < 1000; i++) {
+            for (int i = 0; i < 1; i++) {
                 List *query = createList();
 
                 listInsert(query, valueString(strings[i % 10], "test_string"));
@@ -55,7 +55,7 @@ int main(int argc, char *argv[]) {
                 listInsert(query, valueShort(-12345, "test_short"));
                 listInsert(query, valueUShort(12345, "test_ushort"));
                 listInsert(query, valueInt(-123456789, "test_int"));
-                listInsert(query, valueUint(123456789, "test_uint"));
+                listInsert(query, valueUInt(123456789, "test_uint"));
                 listInsert(query, valueLong(-1234567891011121314, "test_long"));
                 listInsert(query, valueULong(1234567891011121314, "test_ulong"));
 
@@ -63,9 +63,9 @@ int main(int argc, char *argv[]) {
 
                 if (insertMethod != ASYNC) {
                     if (result._uuid < 1) {
-                        println("Return insert values : ERROR[%d]", result.errorCode);
+                        println("\tInsert query: ERROR[%s]", errorToString(result.errorCode));
                     } else {
-                        println("Return insert values : UUID[%lu]", result._uuid);
+                        println("\tInsert query: UUID[%lu]", result._uuid);
                     }
                 }
             }

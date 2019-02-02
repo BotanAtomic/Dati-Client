@@ -40,27 +40,27 @@ uint32_t readUInt(int socket);
 
 uint64_t readULong(int socket);
 
-Node *valueChar(char value, char *var_name);
+Node *valueChar(char value, char *key);
 
-Node *valueUChar(unsigned char value, char *var_name);
+Node *valueUChar(unsigned char value, char *key);
 
-Node *valueShort(int16_t value, char *var_name);
+Node *valueShort(int16_t value, char *key);
 
-Node *valueUShort(uint16_t value, char *var_name);
+Node *valueUShort(uint16_t value, char *key);
 
-Node *valueInt(int32_t value, char *var_name);
+Node *valueInt(int32_t value, char *key);
 
-Node *valueUint(uint32_t value, char *var_name);
+Node *valueUInt(uint32_t value, char *key);
 
-Node *valueLong(int64_t value, char *var_name);
+Node *valueLong(int64_t value, char *key);
 
-Node *valueULong(uint64_t value, char *var_name);
+Node *valueULong(uint64_t value, char *key);
 
-Node *valueFloat(float value, char *var_name);
+Node *valueFloat(float value, char *key);
 
-Node *valueDouble(double value, char *var_name);
+Node *valueDouble(double value, char *key);
 
-Node *valueString(char *value, char *var_name);
+Node *valueString(char *value, char *key);
 
 void serializeValue(Node *value, int socket);
 
@@ -76,10 +76,17 @@ int64_t getLong(const char *);
 
 __uint64_t getULong(const char *);
 
+void onDisconnect();
+
 static void *(*VAR_PARSER[])(const char *) ={
         NULL, NULL, (void *(*)(const char *)) getShort, (void *(*)(const char *)) getShort,
         (void *(*)(const char *)) getInt, (void *(*)(const char *)) getUInt,
         (void *(*)(const char *)) getLong, (void *(*)(const char *)) getULong, NULL, NULL, NULL
+};
+
+static void (*VAR_WRITER[])(void *, int) ={
+        writeByte, writeUByte, writeShort, writeUShort, writeInt, writeUInt,
+        writeLong, writeULong, NULL, NULL, writeString
 };
 
 #endif //DATI_BUFFER_H

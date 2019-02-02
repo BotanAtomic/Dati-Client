@@ -69,29 +69,40 @@ void writeULong(__uint64_t value, int socket) {
     send(socket, buffer, 8, 0);
 }
 
-
 char *readString(size_t size, int socket) {
     char *buffer = malloc(size + 1);
-    recv(socket, buffer, size, 0);
+    ssize_t readSize = recv(socket, buffer, size, 0);
+
+    if (readSize < 0)
+        onDisconnect();
+
+
     buffer[size] = '\0';
     return buffer;
 }
 
 __uint16_t readUShort(int socket) {
     unsigned char buffer[2];
-    recv(socket, buffer, 2, 0);
+    ssize_t readSize = recv(socket, buffer, 2, 0);
+    if (readSize < 0)
+        onDisconnect();
     return (__uint16_t) buffer[0] | ((__uint16_t) buffer[1] << 8);
 }
 
 unsigned char readUByte(int socket) {
     unsigned char buffer;
-    recv(socket, &buffer, 1, 0);
+    ssize_t readSize = recv(socket, &buffer, 1, 0);
+    if (readSize < 0)
+        onDisconnect();
     return buffer;
 }
 
 __uint32_t readUInt(int socket) {
     unsigned char buffer[4];
-    recv(socket, buffer, 4, 0);
+    ssize_t readSize = recv(socket, buffer, 4, 0);
+
+    if (readSize < 0)
+        onDisconnect();
 
     __uint32_t value = 0;
 
@@ -102,7 +113,10 @@ __uint32_t readUInt(int socket) {
 
 __uint64_t readULong(int socket) {
     unsigned char buffer[8];
-    recv(socket, buffer, 8, 0);
+    ssize_t readSize = recv(socket, buffer, 8, 0);
+
+    if (readSize < 0)
+        onDisconnect();
 
     __uint64_t value = 0;
 
@@ -111,99 +125,90 @@ __uint64_t readULong(int socket) {
     return value;
 }
 
-Node *valueChar(char c, char *varName) {
+Node *valueChar(char c, char *key) {
     Node *value = malloc(sizeof(value));
 
-    value->key = varName;
+    value->key = key;
     value->value = (void *) c;
     value->type = CHAR;
 
     return value;
 }
 
-Node *valueUChar(unsigned char c, char *varName) {
+Node *valueUChar(unsigned char c, char *key) {
     Node *value = malloc(sizeof(value));
 
-    value->key = varName;
+    value->key = key;
     value->value = (void *) c;
     value->type = UCHAR;
 
     return value;
 }
 
-Node *valueShort(int16_t value, char *varName) {
+Node *valueShort(int16_t value, char *key) {
     Node *node = malloc(sizeof(node));
 
-    node->key = varName;
+    node->key = key;
     node->value = (void *) value;
     node->type = SHORT;
 
     return node;
 }
 
-Node *valueUShort(uint16_t value, char *varName) {
+Node *valueUShort(uint16_t value, char *key) {
     Node *node = malloc(sizeof(node));
 
-    node->key = varName;
+    node->key = key;
     node->value = (void *) value;
     node->type = USHORT;
 
     return node;
 }
 
-Node *valueLong(int64_t value, char *varName) {
+Node *valueLong(int64_t value, char *key) {
     Node *node = malloc(sizeof(node));
 
-    node->key = varName;
+    node->key = key;
     node->value = (void *) value;
     node->type = LONG;
 
     return node;
 }
 
-Node *valueULong(uint64_t value, char *varName) {
+Node *valueULong(uint64_t value, char *key) {
     Node *node = malloc(sizeof(node));
 
-    node->key = varName;
+    node->key = key;
     node->value = (void *) value;
     node->type = ULONG;
 
     return node;
 }
 
-Node *valueInt(int32_t value, char *varName) {
+Node *valueInt(int32_t value, char *key) {
     Node *node = malloc(sizeof(node));
 
-    node->key = varName;
+    node->key = key;
     node->value = (void *) value;
     node->type = INT;
 
     return node;
 }
 
-Node *valueUint(uint32_t value, char *varName) {
+Node *valueUInt(uint32_t value, char *key) {
     Node *node = malloc(sizeof(node));
 
-    node->key = varName;
+    node->key = key;
     node->value = (void *) value;
     node->type = UINT;
 
     return node;
 }
 
-Node *valueFloat(float f, char *varName) {
-    return NULL;
-}
-
-Node *valueDouble(double d, char *varName) {
-    return NULL;
-
-}
-
-Node *valueString(char *s, char *varName) {
+Node *valueString(char *s, char *key) {
     Node *value = malloc(sizeof(value));
 
-    value->key = varName;
+    value->key = key;
     value->value = (void *) s;
     value->type = STRING;
 
@@ -225,53 +230,8 @@ void serializeValue(Node *value, int socket) {
         writeUInt((uint32_t) strlen((const char *) value->value), socket);
     }
 
-    switch (value->type) {
-        case CHAR:
-            writeByte((char) value->value, socket);
-            break;
-
-        case UCHAR:
-            writeUByte((unsigned char) value->value, socket);
-            break;
-
-        case SHORT:
-            writeShort((int16_t) value->value, socket);
-            break;
-
-        case USHORT:
-            writeUShort((uint16_t) value->value, socket);
-            break;
-
-        case INT:
-            writeInt((int32_t) value->value, socket);
-            break;
-
-        case UINT:
-            writeUInt((uint32_t) value->value, socket);
-            break;
-
-        case LONG:
-            writeLong((int64_t) value->value, socket);
-            break;
-
-        case ULONG:
-            writeULong((uint64_t) value->value, socket);
-            break;
-
-        case FLOAT:
-            break;
-
-        case DOUBLE:
-            break;
-
-        case STRING:
-            writeString((char *) value->value, socket);
-            break;
-        default:
-            break;
-    }
-
-
+    if (value->type != FLOAT && value->type != DOUBLE)
+        VAR_WRITER[value->type](value->value, socket);
 }
 
 
@@ -321,4 +281,9 @@ int64_t getLong(const char *buffer) {
     memcpy(&value, buffer, 8);
 
     return value;
+}
+
+void onDisconnect() {
+    setColor(RED);
+    println("Disconnected from server");
 }

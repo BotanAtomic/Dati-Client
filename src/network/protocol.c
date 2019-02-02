@@ -214,18 +214,18 @@ unsigned char removeTable(Client *client, char *database, char *name) {
     return 0;
 }
 
-unsigned char renameTable(Client *client, char *database, char *last_name, char *new_name) {
+unsigned char renameTable(Client *client, char *database, char *lastName, char *newName) {
     int socket = client->session->socket;
 
     writeUByte(8, socket);
     writeUShort((__uint16_t) strlen(database), socket);
     writeString(database, socket);
 
-    writeUShort((__uint16_t) strlen(last_name), socket);
-    writeString(last_name, socket);
+    writeUShort((__uint16_t) strlen(lastName), socket);
+    writeString(lastName, socket);
 
-    writeUShort((__uint16_t) strlen(new_name), socket);
-    writeString(new_name, socket);
+    writeUShort((__uint16_t) strlen(newName), socket);
+    writeString(newName, socket);
 
     if (readUByte(socket) == 8) {
         unsigned char response;
@@ -355,5 +355,22 @@ List *find(Client *client, char *database, char *table, void (*callback)(TableVa
 
 
     return tables;
+}
+
+uint64_t removeTableValue(Client *client, char *database, char *table, char *filter) {
+    int socket = client->session->socket;
+
+    writeUByte(11, socket);
+
+    writeUShort((__uint16_t) strlen(database), socket);
+    writeString(database, socket);
+
+    writeUShort((__uint16_t) strlen(table), socket);
+    writeString(table, socket);
+
+    writeUByte((unsigned char) strlen(filter), socket);
+    writeString(filter, socket);
+
+    return readULong(socket);
 }
 

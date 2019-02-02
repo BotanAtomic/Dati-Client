@@ -15,6 +15,8 @@ void println(const char *__restrict __format, ...);
 
 void print(const char *__restrict __format, ...);
 
+void printError(const char *__restrict __format, ...);
+
 void setColor(char *);
 
 void resetColor();

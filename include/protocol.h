@@ -14,7 +14,6 @@
 #include "node.h"
 
 
-
 /** @Message_id : 0 **
  *  @Response : unsigned char : SUCCESS(1)/FAILED(0)
 **/
@@ -64,7 +63,7 @@ unsigned char removeTable(Client *client, char *database, char *name);
 /** @Message_id : 8 **
  *  @Response : unsigned char : SUCCESS(1)/FAILED(0) & unsigned char : error_code
 **/
-unsigned char renameTable(Client *client, char *database, char *last_name, char *new_name);
+unsigned char renameTable(Client *client, char *database, char *lastName, char *newName);
 
 
 /*** VALUES ***/
@@ -75,10 +74,16 @@ unsigned char renameTable(Client *client, char *database, char *last_name, char 
 **/
 InsertResult insertValue(Client *client, char *database, char *table, List *insertQuery, char async);
 
-/** @Message_id : 9 **
+/** @Message_id : 10 **
  *  @_uuid : unique id of inserted statement
 *  @Response : insert_result { @_uuid, @error_code }
 **/
-List * find(Client *client, char *database, char *table, void (*callback)(TableValue *), char * filter);
+List *find(Client *client, char *database, char *table, void (*callback)(TableValue *), char *filter);
+
+/** @Message_id : 11 **
+ *  @_uuid : unique id of inserted statement
+*  @Response : insert_result { @_uuid, @error_code }
+**/
+uint64_t removeTableValue(Client *client, char *database, char *table, char *filter);
 
 #endif //DATI_PROTOCOL_H

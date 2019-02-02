@@ -1,0 +1,14 @@
+INSERT {
+
+    Database=esgi
+    table=students
+    method=SYNC
+
+    values[
+        STRING:"name"= "Ahmad"
+        STRING: "surname"="Goran"
+        SHORT: "size" = 183
+        ULONG:"register_date"=919814400
+    ]
+
+}

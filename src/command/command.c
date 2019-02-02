@@ -17,6 +17,7 @@
 #include "command.h"
 #include "utils.h"
 #include "variable.h"
+#include "script.h"
 
 #define MAX_COMMAND_SIZE 2000
 
@@ -27,6 +28,8 @@
 #define REMOVE 150798991
 #define SEARCH 146342519
 #define HELP 68878762
+#define DELETE 142803572
+#define EXECUTE 197853940
 #define EXIT 71696827
 
 
@@ -108,7 +111,7 @@ void create(char *target, char *objectName) {
     }
 }
 
-void delete(char *target, char *objectName) {
+void removeElement(char *target, char *objectName) {
     if (!checkDatabaseConnection())
         return;
 
@@ -154,32 +157,37 @@ void tableValueCallback(TableValue *tableValue) {
             default:
                 println("(null)");
         }
-
-
     }
     println("\t}\n");
-}
-
-long long current_timestamp() {
-    struct timeval te;
-    gettimeofday(&te, NULL);
-    long long milliseconds = te.tv_sec*1000LL + te.tv_usec/1000;
-    return milliseconds;
 }
 
 void findTableValue(char *table, char *filter) {
     if (!checkDatabaseConnection())
         return;
 
-    long long start = current_timestamp();
+    long long start = currentTimestamp();
 
     List *values = find(currentClient, selectedDatabase, table, tableValueCallback, filter);
 
-    long long end = current_timestamp();
+    long long end = currentTimestamp();
 
-    println("Result : %d elements in %ld ms", values->length, (end - start));
+    println("Result : %d elements found in %ld ms", values->length, (end - start));
 
     listFree(values);
+}
+
+void deleteTableValue(char *table, char *filter) {
+    if (!checkDatabaseConnection())
+        return;
+
+    long long start = currentTimestamp();
+
+    uint64_t values = removeTableValue(currentClient, selectedDatabase, table, filter);
+
+    long long end = currentTimestamp();
+
+    println("Result : %d elements removed in %ld ms", values, (end - start));
+
 }
 
 
@@ -196,43 +204,20 @@ unsigned hash(char *data) {
 }
 
 
-void toLowerCase(char *s) {
-    for (int i = 0; i < strlen(s); i++)
-        s[i] = (char) tolower(s[i]);
-}
-
-void trim(char *s) {
-    char *p = s;
-    size_t l = strlen(p);
-
-    while (isspace(p[l - 1])) p[--l] = 0;
-    while (*p && isspace(*p)) ++p, --l;
-
-    toLowerCase(p);
-
-    memmove(s, p, l + 1);
-}
-
-
 void parse(char *command) {
     List *args = createList();
-    char *baseCommand = "";
+
+    print("Execution of ");
+    setColor(YELLOW);
+    println("[%s]", command);
 
     char *token = strtok(command, " ");
 
     int i = 0;
     while (token != NULL) {
-        if (i == 0) {
-            baseCommand = malloc(strlen(token) + 1);
-            memcpy(baseCommand, token, strlen(token) + 1);
-            print("Execution of ");
-            setColor(YELLOW);
-            println("[%s]", baseCommand);
-        } else {
+        if (i > 0)
             listInsert(args, token);
-        }
         token = strtok(NULL, " ");;
-
         i++;
     }
 
@@ -270,9 +255,17 @@ void parse(char *command) {
 
         case REMOVE:
             if (args->length > 1)
-                delete(listGet(args, 1), listGet(args, 0));
+                removeElement(listGet(args, 1), listGet(args, 0));
             else
                 println("\t Invalid argument, use 'database' or 'table' and object name\n");
+            break;
+
+        case DELETE:
+            if (args->length > 1)
+                deleteTableValue(listGet(args, 1), listGet(args, 0));
+            else
+                println("\t- Invalid argument, you must specify table name and filter");
+            break;
             break;
 
         case SEARCH:
@@ -284,12 +277,19 @@ void parse(char *command) {
         case HELP:
             showHelp();
             break;
+        case EXECUTE:
+            if (args->length > 0)
+                executeScript(currentClient, listGet(args, 0));
+            else
+                println("\t- Invalid argument, you must specify script path");
+            break;
         case EXIT:
             println("Bye Bye");
             exited = 1;
             break;
         default:
-            println("Invalid command [%s]", baseCommand);
+            setColor(RED);
+            println("\t- Invalid command");
             break;
     }
 
@@ -308,7 +308,7 @@ void listenCommand() {
     while (!exited) {
         print(strlen(command) > 0 ? "Datuak > " : "");
         fgets(command, MAX_COMMAND_SIZE, stdin);
-        trim(command);
+        formatString(command, 1);
 
         if (strlen(command) > 0)
             parse(command);
